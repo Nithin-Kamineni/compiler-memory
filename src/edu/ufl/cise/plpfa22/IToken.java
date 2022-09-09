@@ -17,6 +17,7 @@ public interface IToken {
 	    	IDENT,
 	    	NUM_LIT,
 	    	STRING_LIT,
+//			FlOAT_LIT,
 	    	BOOLEAN_LIT,   //TRUE, FALSE
 	    	DOT,	// .    	
 	    	COMMA,  // , 

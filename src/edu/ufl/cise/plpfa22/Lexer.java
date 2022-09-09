@@ -13,8 +13,7 @@ public class Lexer implements ILexer {
 
 
     private enum STATE {
-        START, IN_IDENT, HAVE_ZERO, HAVE_DOT, IN_STRING,
-        IN_FLOAT, IN_NUM, HAVE_EQ, HAVE_MINUS, HAVE_PLUS, WHITE_SPACE, TIMES, HAVE_LT, HAVE_EX, HAVE_GT,
+        START, IN_IDENT, HAVE_ZERO, HAVE_DOT, IN_STRING, IN_NUM, HAVE_EQ, HAVE_PLUS, WHITE_SPACE, TIMES, HAVE_LT, HAVE_EX, HAVE_GT,
         HAVE_SLASH, IN_COMMENT;
     }
 
@@ -118,10 +117,12 @@ public class Lexer implements ILexer {
                         case '=' -> {
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
-                            currState = STATE.HAVE_EQ;
+                            char[] cht = {ch};
+                            Token token = new Token(IToken.Kind.EQ, cht, token_position, 1);
+                            tokens.add(token);
                             col++;
                             position++;
-
+                            return  token;
                         }
                         case '+' -> {
                             token_position = new IToken.SourceLocation(line, col);
@@ -220,7 +221,9 @@ public class Lexer implements ILexer {
                         case '-' -> {
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
-                            currState = STATE.HAVE_MINUS;
+                            char[] cht = {ch};
+                            Token token = new Token(IToken.Kind.MINUS, cht, token_position, 1);
+                            tokens.add(token);
                             col++;
                             position++;
                         }
@@ -424,28 +427,28 @@ public class Lexer implements ILexer {
 //
 //                }
 
-                case HAVE_ZERO -> {
-                    switch (ch) {
-                        case '.' -> {
-                            currState = STATE.HAVE_DOT;
-                            position++;
-                            col++;
-                        }
-                        default -> {
-
-                            String temp = sourceCode.substring(startPosition, position);
-                            char[] tempChars = new char[temp.length()];
-                            for(int i = 0; i<temp.length();i++){
-                                tempChars[i]=temp.charAt(i);
-                            }
-
-                            Token token = new Token(IToken.Kind.NUM_LIT, tempChars,
-                                    token_position, (position - startPosition));
-                            currState = STATE.START;
-                            return token;
-                        }
-                    }
-                }
+//                case HAVE_ZERO -> {
+//                    switch (ch) {
+//                        case '.' -> {
+//                            currState = STATE.HAVE_DOT;
+//                            position++;
+//                            col++;
+//                        }
+//                        default -> {
+//
+//                            String temp = sourceCode.substring(startPosition, position);
+//                            char[] tempChars = new char[temp.length()];
+//                            for(int i = 0; i<temp.length();i++){
+//                                tempChars[i]=temp.charAt(i);
+//                            }
+//
+//                            Token token = new Token(IToken.Kind.NUM_LIT, tempChars,
+//                                    token_position, (position - startPosition));
+//                            currState = STATE.START;
+//                            return token;
+//                        }
+//                    }
+//                }
 
                 case IN_IDENT -> {
                     if (Character.isJavaIdentifierPart(ch)) {
@@ -473,19 +476,19 @@ public class Lexer implements ILexer {
                         return token;
                     }
                 }
-                case HAVE_DOT -> {
-                    switch (ch) {
-                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
-                            currState = STATE.IN_FLOAT;
-                            col++;
-                            position++;
-                        }
-                        default -> {
-                            throw new LexicalException("found error with input number(check number again)",
-                                    token_position.line(), token_position.column());
-                        }
-                    }
-                }
+//                case HAVE_DOT -> {
+//                    switch (ch) {
+//                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+//                            currState = STATE.IN_FLOAT;
+//                            col++;
+//                            position++;
+//                        }
+//                        default -> {
+//                            throw new LexicalException("found error with input number(check number again)",
+//                                    token_position.line(), token_position.column());
+//                        }
+//                    }
+//                }
 
                 case IN_NUM -> {
                     switch (ch) {
@@ -493,11 +496,11 @@ public class Lexer implements ILexer {
                             position++;
                             col++;
                         }
-                        case '.' -> {
-                            currState = STATE.HAVE_DOT;
-                            col++;
-                            position++;
-                        }
+//                        case '.' -> {
+//                            currState = STATE.HAVE_DOT;
+//                            col++;
+//                            position++;
+//                        }
                         default -> {
                             String str = sourceCode.substring(startPosition, position);
                             char[] tempChars = new char[str.length()];
@@ -566,77 +569,54 @@ public class Lexer implements ILexer {
 
                 }
 
-                case IN_FLOAT -> {
-                    switch (ch) {
-                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
-                            col++;
-                            position++;
-                        }
-                        default -> {
-                            String fl = sourceCode.substring(startPosition, position);
+//                case IN_FLOAT -> {
+//                    switch (ch) {
+//                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+//                            col++;
+//                            position++;
+//                        }
+//                        default -> {
+//                            String fl = sourceCode.substring(startPosition, position);
+//
+//                            Token token = new Token(IToken.Kind.FLOAT_LIT,
+//                                    sourceCode.substring(startPosition, position),
+//                                    token_position, (position - startPosition));
+//
+//                            try {
+//                                float floatValue = Float.valueOf(fl);
+//                            } catch (Exception e) {
+//                                throw new LexicalException("Invalid float input", token_position.line(),
+//                                        token_position.column());
+//                            }
+//                            currState = STATE.START;
+//                            return token;
+//                        }
+//                    }
+//                }
 
-                            Token token = new Token(IToken.Kind.FLOAT_LIT,
-                                    sourceCode.substring(startPosition, position),
-                                    token_position, (position - startPosition));
-
-                            try {
-                                float floatValue = Float.valueOf(fl);
-                            } catch (Exception e) {
-                                throw new LexicalException("Invalid float input", token_position.line(),
-                                        token_position.column());
-                            }
-                            currState = STATE.START;
-                            return token;
-                        }
-                    }
-                }
-
-                case HAVE_EQ -> {
-
-                    switch (ch) {
-
-                        case '=' -> {
-                            Token token = new Token(IToken.Kind.EQUALS,
-                                    sourceCode.substring(startPosition, position + 1),
-                                    token_position, (position + 1) - startPosition);
-                            currState = STATE.START;
-                            col++;
-                            position++;
-                            return token;
-                        }
-                        default -> {
-                            Token token = new Token(IToken.Kind.ASSIGN, sourceCode.substring(startPosition, position),
-                                    token_position, 1);
-                            currState = STATE.START;
-                            return token;
-                        }
-
-                    }
-
-                }
-                case HAVE_MINUS -> {
-
-                    switch (ch) {
-
-                        case '>' -> {
-                            Token token = new Token(IToken.Kind.RARROW,
-                                    sourceCode.substring(startPosition, position + 1),
-                                    token_position, (position + 1) - startPosition);
-                            currState = STATE.START;
-                            col++;
-                            position++;
-                            return token;
-                        }
-                        default -> {
-                            Token token = new Token(IToken.Kind.MINUS, sourceCode.substring(startPosition, position),
-                                    token_position, 1);
-                            currState = STATE.START;
-                            return token;
-                        }
-
-                    }
-
-                }
+//                case HAVE_MINUS -> {
+//
+//                    switch (ch) {
+//
+//                        case '>' -> {
+//                            Token token = new Token(IToken.Kind.RARROW,
+//                                    sourceCode.substring(startPosition, position + 1),
+//                                    token_position, (position + 1) - startPosition);
+//                            currState = STATE.START;
+//                            col++;
+//                            position++;
+//                            return token;
+//                        }
+//                        default -> {
+//                            Token token = new Token(IToken.Kind.MINUS, sourceCode.substring(startPosition, position),
+//                                    token_position, 1);
+//                            currState = STATE.START;
+//                            return token;
+//                        }
+//
+//                    }
+//
+//                }
                 case IN_STRING -> {
 
                     switch (ch) {
@@ -647,8 +627,15 @@ public class Lexer implements ILexer {
                             position++;
                         }
                         case '"' -> {
+                            String temp = sourceCode.substring(startPosition, position + 1);
+                            char[] tempList = new char[temp.length()];
+                            for (int i = 0;i<temp.length();i++){
+                                tempList[i] = temp.charAt(i);
+                            }
+
                             Token token = new Token(IToken.Kind.STRING_LIT,
-                                    sourceCode.substring(startPosition, position + 1),
+//                                    sourceCode.substring(startPosition, position + 1),
+                                    tempList,
                                     token_position, (position + 1) - startPosition);
                             currState = STATE.START;
                             col++;
