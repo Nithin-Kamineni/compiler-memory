@@ -28,6 +28,7 @@ public class Token implements IToken {
 
     @Override
     public SourceLocation getSourceLocation() {
+        System.out.println("pos:" +pos);
         return pos;
     }
 

@@ -7,13 +7,13 @@ import java.util.Map;
 public class Lexer implements ILexer {
 
     int position = 0;
-    int line = 0;
+    int line = 1;
     int col = 0;
     int startPosition = 0;
 
 
     private enum STATE {
-        START, IN_IDENT, HAVE_ZERO, HAVE_DOT, IN_STRING, IN_NUM, HAVE_EQ, HAVE_PLUS, WHITE_SPACE, TIMES, HAVE_LT, HAVE_EX, HAVE_GT,
+        START, IN_IDENT, HAVE_ZERO, IN_STRING, IN_NUM, WHITE_SPACE, TIMES, HAVE_LT, HAVE_EX, HAVE_GT,
         HAVE_SLASH, IN_COMMENT;
     }
 
@@ -35,13 +35,13 @@ public class Lexer implements ILexer {
         if (position >= sourceCode.length()) {
             Token token = new Token(IToken.Kind.EOF, null, null, 0);
             tokens.add(token);
+
             return token;
         }
 
         Token token = getToken();
         tokens.add(token);
         return token;
-
     }
 
     @Override
@@ -70,8 +70,8 @@ public class Lexer implements ILexer {
 
 
     private void HashMap() {
-        rsrvd.put("true", IToken.Kind.BOOLEAN_LIT);
-        rsrvd.put("false", IToken.Kind.BOOLEAN_LIT);
+        rsrvd.put("TRUE", IToken.Kind.BOOLEAN_LIT);
+        rsrvd.put("FALSE", IToken.Kind.BOOLEAN_LIT);
 
         rsrvd.put("CONST", IToken.Kind.KW_CONST);
         rsrvd.put("VAR", IToken.Kind.KW_VAR);
@@ -118,23 +118,37 @@ public class Lexer implements ILexer {
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
                             char[] cht = {ch};
-                            Token token = new Token(IToken.Kind.EQ, cht, token_position, 1);
-                            tokens.add(token);
                             col++;
                             position++;
+                            System.out.println(ch);
+                            token_position = new IToken.SourceLocation(line, col);
+                            Token token = new Token(IToken.Kind.EQ, cht, token_position, 1);
+                            tokens.add(token);
                             return  token;
                         }
                         case '+' -> {
-                            token_position = new IToken.SourceLocation(line, col);
+
+
                             startPosition = position;
                             // can i remove this?
 //                            Token token = new Token(IToken.Kind.PLUS, String.valueOf(ch), token_position, 1);
                             char[] cht = {ch};
-                            Token token = new Token(IToken.Kind.PLUS, cht, token_position, 1);
-                            tokens.add(token);
+//                            System.out.println(ch);
                             col++;
                             position++;
+                            token_position = new IToken.SourceLocation(line, col);
+                            Token token = new Token(IToken.Kind.PLUS, cht, token_position, 1);
+                            tokens.add(token);
+//                            col++;
+//                            position++;
+//                            System.out.println(col);
+//                            System.out.println(position);
+//                            token_position = new IToken.SourceLocation(col,position);
+//                            token = new Token(IToken.Kind.PLUS, cht, token_position, 1);
+
                             return token;
+
+//                            currState = STATE.HAVE_ZERO;
                         }
 
                         case '#' -> {
@@ -222,10 +236,13 @@ public class Lexer implements ILexer {
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
                             char[] cht = {ch};
-                            Token token = new Token(IToken.Kind.MINUS, cht, token_position, 1);
-                            tokens.add(token);
+                            System.out.println(ch);
                             col++;
                             position++;
+                            token_position = new IToken.SourceLocation(line,col);
+                            Token token = new Token(IToken.Kind.MINUS, cht, token_position, 1);
+                            tokens.add(token);
+                            return token;
                         }
 
                         case '<' -> {

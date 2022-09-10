@@ -84,13 +84,24 @@ class LexerTest {
 		show(lexer);
 		checkEOF(lexer.next());
 	}
-	
+
+	//identifier.
+//	@Test
+//	void testID() throws LexicalException {
+//		String input = "ad23";
+//		show(input);
+//		ILexer lexer = getLexer(input);
+//		show(lexer);
+//		checkToken(lexer.next(), Kind.IDENT, 1,1);
+//		checkEOF(lexer.next());
+//	}
+
 	//A couple of single character tokens
 	@Test
 	void testSingleChar0() throws LexicalException {
 		String input = """
-				+ 
-				- 	 
+				+
+				-
 				""";
 		show(input);
 		ILexer lexer = getLexer(input);
@@ -98,7 +109,20 @@ class LexerTest {
 		checkToken(lexer.next(), Kind.MINUS, 2,1);
 		checkEOF(lexer.next());
 	}
-	
+
+	//A couple of single character tokens
+	@Test
+	void testSingleChar1() throws LexicalException {
+		String input = """
+				=
+				""";
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.EQ, 1,1);
+//		checkToken(lexer.next(), Kind.MINUS, 2,1);
+		checkEOF(lexer.next());
+	}
+
 	//comments should be skipped
 	@Test
 	void testComment0() throws LexicalException {
@@ -208,6 +232,24 @@ class LexerTest {
 		String text = String.valueOf(t.getText());
 		String expectedText = "\" ...  \\\"  \\\'  \\\\  \""; //almost the same as input, but white space is omitted
 		assertEquals(expectedText,text);		
+	}
+
+
+
+	//series
+	@Test
+	void testSingleChar2() throws LexicalException {
+		String input = """
+				+
+				-
+				 =
+				""";
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.PLUS, 1,1);
+		checkToken(lexer.next(), Kind.MINUS, 2,1);
+		checkToken(lexer.next(), Kind.EQ, 3,2);
+		checkEOF(lexer.next());
 	}
 }
 
