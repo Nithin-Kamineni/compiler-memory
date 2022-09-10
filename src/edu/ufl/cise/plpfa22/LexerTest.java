@@ -85,16 +85,18 @@ class LexerTest {
 		checkEOF(lexer.next());
 	}
 
-	//identifier.
-//	@Test
-//	void testID() throws LexicalException {
-//		String input = "ad23";
-//		show(input);
-//		ILexer lexer = getLexer(input);
-//		show(lexer);
-//		checkToken(lexer.next(), Kind.IDENT, 1,1);
-//		checkEOF(lexer.next());
-//	}
+//	identifier.
+	@Test
+	void testID() throws LexicalException {
+		String input = """
+					ad23
+					""";
+		show(input);
+		ILexer lexer = getLexer(input);
+		show(lexer);
+		checkToken(lexer.next(), Kind.IDENT, 1,1);
+		checkEOF(lexer.next());
+	}
 
 	//A couple of single character tokens
 	@Test
@@ -243,12 +245,26 @@ class LexerTest {
 				+
 				-
 				 =
+				%
 				""";
 		show(input);
 		ILexer lexer = getLexer(input);
 		checkToken(lexer.next(), Kind.PLUS, 1,1);
 		checkToken(lexer.next(), Kind.MINUS, 2,1);
 		checkToken(lexer.next(), Kind.EQ, 3,2);
+		checkToken(lexer.next(), Kind.MOD, 4,1);
+		checkEOF(lexer.next());
+	}
+
+	//Mod
+	@Test
+	void testSingleMod() throws LexicalException {
+		String input = """
+				%
+				""";
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.MOD, 1,1);
 		checkEOF(lexer.next());
 	}
 }

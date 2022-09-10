@@ -8,13 +8,13 @@ public class Lexer implements ILexer {
 
     int position = 0;
     int line = 1;
-    int col = 0;
+    int col =  1;
     int startPosition = 0;
 
 
     private enum STATE {
         START, IN_IDENT, HAVE_ZERO, IN_STRING, IN_NUM, WHITE_SPACE, TIMES, HAVE_LT, HAVE_EX, HAVE_GT,
-        HAVE_SLASH, IN_COMMENT;
+        HAVE_SLASH, IN_COMMENT, HAVE_FSLASH;
     }
 
     private STATE currState;
@@ -118,12 +118,12 @@ public class Lexer implements ILexer {
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
                             char[] cht = {ch};
-                            col++;
-                            position++;
                             System.out.println(ch);
                             token_position = new IToken.SourceLocation(line, col);
                             Token token = new Token(IToken.Kind.EQ, cht, token_position, 1);
                             tokens.add(token);
+                            col++;
+                            position++;
                             return  token;
                         }
                         case '+' -> {
@@ -134,13 +134,13 @@ public class Lexer implements ILexer {
 //                            Token token = new Token(IToken.Kind.PLUS, String.valueOf(ch), token_position, 1);
                             char[] cht = {ch};
 //                            System.out.println(ch);
-                            col++;
-                            position++;
+//                            col++;
+//                            position++;
                             token_position = new IToken.SourceLocation(line, col);
                             Token token = new Token(IToken.Kind.PLUS, cht, token_position, 1);
                             tokens.add(token);
-//                            col++;
-//                            position++;
+                            col++;
+                            position++;
 //                            System.out.println(col);
 //                            System.out.println(position);
 //                            token_position = new IToken.SourceLocation(col,position);
@@ -158,36 +158,43 @@ public class Lexer implements ILexer {
                         }
 
                         case '*' -> {
+                            col++;
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
                             char[] cht = {ch};
                             Token token = new Token(IToken.Kind.TIMES, cht, token_position, 1);
                             tokens.add(token);
-                            col++;
                             position++;
                             return token;
                         }
 
                         case '%' -> {
+                            col++;
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
                             char[] cht = {ch};
                             Token token = new Token(IToken.Kind.MOD, cht, token_position, 1);
                             tokens.add(token);
-                            col++;
+//                            col++;
                             position++;
                             return token;
                         }
 
                         case '/' -> {
+//                            token_position = new IToken.SourceLocation(line, col);
+//                            startPosition = position;
+//                            char[] cht = {ch};
+//                            Token token = new Token(IToken.Kind.DIV, cht, token_position, 1);
+//                            tokens.add(token);
+//                            col++;
+//                            position++;
+//                            return token;
+
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
-                            char[] cht = {ch};
-                            Token token = new Token(IToken.Kind.DIV, cht, token_position, 1);
-                            tokens.add(token);
+                            currState = STATE.HAVE_FSLASH;
                             col++;
                             position++;
-                            return token;
                         }
 
 
@@ -345,6 +352,7 @@ public class Lexer implements ILexer {
                             if (Character.isJavaIdentifierStart(ch)) {
                                 token_position = new IToken.SourceLocation(line, col);
                                 startPosition = position;
+                                System.out.println("test - *");
                                 currState = STATE.IN_IDENT;
                                 col++;
                                 position++;
@@ -479,7 +487,7 @@ public class Lexer implements ILexer {
                         for(int i = 0; i<ident.length();i++){
                             identChars[i]=ident.charAt(i);
                         }
-
+                        System.out.println("col:"+col);
                         for (Map.Entry<String, IToken.Kind> entry : rsrvd.entrySet()) {
                             if (ident.equals(entry.getKey())) {
                                 Token token = new Token(entry.getValue(), identChars, token_position,
@@ -488,6 +496,8 @@ public class Lexer implements ILexer {
                                 return token;
                             }
                         }
+//                        System.out.println(identChars[0]);
+                        token_position = new IToken.SourceLocation(line, col-(identChars.length-1));
                         Token token = new Token(IToken.Kind.IDENT, identChars, token_position, position - startPosition);
                         currState = STATE.START;
                         return token;
@@ -650,6 +660,7 @@ public class Lexer implements ILexer {
                                 tempList[i] = temp.charAt(i);
                             }
 
+//                            token_position = new IToken.SourceLocation(line, col);
                             Token token = new Token(IToken.Kind.STRING_LIT,
 //                                    sourceCode.substring(startPosition, position + 1),
                                     tempList,
@@ -708,7 +719,27 @@ public class Lexer implements ILexer {
                     }
 
                 }
+                case HAVE_FSLASH -> {
 
+                    switch (ch){
+
+                        case '/' -> {
+                            currState = STATE.IN_COMMENT;
+                            col++;
+                            position++;
+                        }
+                        default -> {
+                            token_position = new IToken.SourceLocation(line, col);
+                            startPosition = position;
+                            char[] cht = {ch};
+                            Token token = new Token(IToken.Kind.DIV, cht, token_position, 1);
+                            tokens.add(token);
+                            col++;
+                            position++;
+                            return token;
+                        }
+                    }
+                }
             }
 
         }
