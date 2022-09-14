@@ -91,6 +91,7 @@ public class Lexer implements ILexer {
     private Token getToken() throws LexicalException {
 
         IToken.SourceLocation token_position = null;
+        boolean CompleteString = true;
 
         while (true) {
             if (position >= sourceCode.length()) {
@@ -113,6 +114,12 @@ public class Lexer implements ILexer {
                             position++;
                             col = 1;
                         }
+
+//                        case '\\' -> {
+//                            col++;
+//                            col++;
+//                            position++;
+//                        }
 
                         case '=' -> {
                             token_position = new IToken.SourceLocation(line, col);
@@ -358,11 +365,20 @@ public class Lexer implements ILexer {
 
 
                         case '0' -> {
+//                            token_position = new IToken.SourceLocation(line, col);
+//                            startPosition = position;
+//                            currState = STATE.HAVE_ZERO;
+//                            col++;
+//                            position++;
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
-                            currState = STATE.HAVE_ZERO;
+                            char[] cht = {ch};
+                            Token token = new Token(IToken.Kind.NUM_LIT, cht, token_position, 1);
+                            tokens.add(token);
                             col++;
                             position++;
+                            currState = STATE.START;
+                            return token;
                         }
                         case '>' -> {
                             token_position = new IToken.SourceLocation(line, col);
@@ -374,6 +390,7 @@ public class Lexer implements ILexer {
                         case '"' -> {
                             token_position = new IToken.SourceLocation(line, col);
                             startPosition = position;
+                            CompleteString = false;
                             currState = STATE.IN_STRING;
                             col++;
                             position++;
@@ -559,6 +576,7 @@ public class Lexer implements ILexer {
                 case IN_NUM -> {
                     switch (ch) {
                         case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+//                        case '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
                             position++;
                             col++;
                         }
@@ -693,6 +711,7 @@ public class Lexer implements ILexer {
                             position++;
                         }
                         case '"' -> {
+                            CompleteString = true;
                             String temp = sourceCode.substring(startPosition, position + 1);
                             char[] tempList = new char[temp.length()];
                             for (int i = 0;i<temp.length();i++){
@@ -717,11 +736,22 @@ public class Lexer implements ILexer {
                         default -> {
                             col++;
                             position++;
+//                            System.out.println(sourceCode.charAt(position));
+//                            System.out.println(position+" "+sourceCode.length());
+//                            if(position==sourceCode.length()-1 || sourceCode.charAt(position)!='"'){
+//                                throw new LexicalException("Invalid escape character", token_position.line(),
+//                                        token_position.column());
+//                            }
                         }
 
                     }
+//                    if(!CompleteString){
+//                        throw new LexicalException("String did not finish", token_position.line(),
+//                                token_position.column());
+//                    }
 
                 }
+
                 case IN_COMMENT -> {
 
                     switch (ch) {
