@@ -526,28 +526,30 @@ class LexerTest {
 	//Test 14
 	@Test
 	public void testInvalidEscapeSequence() throws LexicalException {
-		String input = "\"esc\\\"";
+		String input = """
+  	"esc\\"
+  				""";
 		show(input);
 		ILexer lexer = getLexer(input);
-		checkIdent(lexer.next(), "invalid", 1,1);
+		//checkIdent(lexer.next(), "invalid", 1,1);
 		assertThrows(LexicalException.class, () -> {
 			lexer.next();
 		});
 	}
 
-	//Test 14
-	@Test
-	public void testInvalidEscapeSequence1() throws LexicalException {
-		String input = """
-				"esc\\"
-				""";
-		show(input);
-		ILexer lexer = getLexer(input);
-		checkIdent(lexer.next(), "invalid", 1,1);
-		assertThrows(LexicalException.class, () -> {
-			lexer.next();
-		});
-	}
+//	//Test 14
+//	@Test
+//	public void testInvalidEscapeSequence1() throws LexicalException {
+//		String input = """
+//				"esc\\"
+//				""";
+//		show(input);
+//		ILexer lexer = getLexer(input);
+//		checkIdent(lexer.next(), "invalid", 1,1);
+//		assertThrows(LexicalException.class, () -> {
+//			lexer.next();
+//		});
+//	}
 
 	//Test 15
 	@Test
