@@ -115,17 +115,17 @@ public class Lexer implements ILexer {
                 return new Token(IToken.Kind.EOF, null, null, 0);
             }
 
-            char ch = inputStr.charAt(currentPoint);
+            char character = inputStr.charAt(currentPoint);
             switch (currentState) {
                 // DFA
                 case START -> {
-                    switch (ch) {
+                    switch (character) {
                         case '*' -> {
 //                            col++;
                             token_ref = 0;
                             Loc_token = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.TIMES, cht, Loc_token, 1);
                             sti = 0;
                             tokenList.add(token);
@@ -149,7 +149,7 @@ public class Lexer implements ILexer {
                             Loc_token = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
                             token_ref = 0;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.QUESTION, cht, Loc_token, 1);
                             tokenList.add(token);
                             column++;
@@ -162,8 +162,8 @@ public class Lexer implements ILexer {
                             token_ref = 0;
                             Loc_token = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
-                            char[] cht = {ch};
-                            System.out.println(ch);
+                            char[] cht = {character};
+                            System.out.println(character);
                             Loc_token = new IToken.SourceLocation(row, column);
                             Token token = new Token(IToken.Kind.EQ, cht, Loc_token, 1);
                             sti = 0;
@@ -193,7 +193,7 @@ public class Lexer implements ILexer {
                             Loc_token = new IToken.SourceLocation(row, column);
                             sti = 0;
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             token_ref = 0;
                             Token token = new Token(IToken.Kind.MOD, cht, Loc_token, 1);
                             tokenList.add(token);
@@ -210,7 +210,7 @@ public class Lexer implements ILexer {
                             Loc_token = new IToken.SourceLocation(row, column);
                             token_ref = 0;
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.NEQ, cht, Loc_token, 1);
                             sti = 0;
                             tokenList.add(token);
@@ -225,10 +225,10 @@ public class Lexer implements ILexer {
                             token_ref = 0;
                             initPoint = currentPoint;
                             // can i remove this?
-//                            Token token = new Token(IToken.Kind.PLUS, String.valueOf(ch), token_l, 1);
+//                            Token token = new Token(IToken.Kind.PLUS, String.valueOf(character), token_l, 1);
 
-                            char[] cht = {ch};
-//                            System.out.println(ch);
+                            char[] cht = {character};
+//                            System.out.println(character);
 //                            col++;
 //                            position++;
                             Loc_token = new IToken.SourceLocation(row, column);
@@ -261,7 +261,7 @@ public class Lexer implements ILexer {
                             sti = 0;
                             Loc_token = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             token_ref = 0;
                             Token token = new Token(IToken.Kind.DOT, cht, Loc_token, 1);
                             sti = 0;
@@ -276,7 +276,7 @@ public class Lexer implements ILexer {
                         case '/' -> {
 //                            token_l = new IToken.SourceLocation(line, col);
 //                            startPosition = position;
-//                            char[] cht = {ch};
+//                            char[] cht = {character};
 //                            Token token = new Token(IToken.Kind.DIV, cht, token_l, 1);
 //                            tokens.add(token);
 //                            col++;
@@ -297,7 +297,7 @@ public class Lexer implements ILexer {
                             sti = 0;
                             Loc_token = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             token_ref = 0;
                             Token token = new Token(IToken.Kind.SEMI, cht, Loc_token, 1);
                             tokenList.add(token);
@@ -310,7 +310,7 @@ public class Lexer implements ILexer {
 //                        case '|' -> {
 //                            token_l = new IToken.SourceLocation(line, col);
 //                            startPosition = position;
-//                            Token token = new Token(IToken.Kind.OR, String.valueOf(ch), token_l, 1);
+//                            Token token = new Token(IToken.Kind.OR, String.valueOf(character), token_l, 1);
 //                            tokens.add(token);
 //                            col++;
 //                            position++;
@@ -319,7 +319,7 @@ public class Lexer implements ILexer {
 //                        case '^' -> {
 //                            token_l = new IToken.SourceLocation(line, col);
 //                            startPosition = position;
-//                            Token token = new Token(IToken.Kind.RETURN, String.valueOf(ch), token_l, 1);
+//                            Token token = new Token(IToken.Kind.RETURN, String.valueOf(character), token_l, 1);
 //                            tokens.add(token);
 //                            col++;
 //                            position++;
@@ -330,7 +330,7 @@ public class Lexer implements ILexer {
                             sti = 0;
                             Loc_token = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.COMMA, cht, Loc_token, 1);
                             tokenList.add(token);
                             column++;
@@ -343,8 +343,8 @@ public class Lexer implements ILexer {
                             sti = 0;
                             Loc_token = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
-                            char[] cht = {ch};
-//                            System.out.println(ch);
+                            char[] cht = {character};
+//                            System.out.println(character);
 //                            col++;
 //                            position++;
 //                            token_l = new IToken.SourceLocation(line,col);
@@ -366,8 +366,8 @@ public class Lexer implements ILexer {
                             token_ref = 0;
                             initPoint = currentPoint;
                             // can i remove this?
-//                            Token token = new Token(IToken.Kind.PLUS, String.valueOf(ch), token_l, 1);
-                            char[] cht = {ch};
+//                            Token token = new Token(IToken.Kind.PLUS, String.valueOf(character), token_l, 1);
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.BANG, cht, Loc_token, 1);
                             tokenList.add(token);
                             column++;
@@ -390,7 +390,7 @@ public class Lexer implements ILexer {
 //                        case '[' -> {
 //                            token_l = new IToken.SourceLocation(line, col);
 //                            startPosition = position;
-//                            Token token = new Token(IToken.Kind.LSQUARE, String.valueOf(ch), token_l, 1);
+//                            Token token = new Token(IToken.Kind.LSQUARE, String.valueOf(character), token_l, 1);
 //                            tokens.add(token);
 //                            col++;
 //                            position++;
@@ -399,7 +399,7 @@ public class Lexer implements ILexer {
 //                        case ']' -> {
 //                            token_l = new IToken.SourceLocation(line, col);
 //                            startPosition = position;
-//                            Token token = new Token(IToken.Kind.RSQUARE, String.valueOf(ch), token_l, 1);
+//                            Token token = new Token(IToken.Kind.RSQUARE, String.valueOf(character), token_l, 1);
 //                            tokens.add(token);
 //                            col++;
 //                            position++;
@@ -412,7 +412,7 @@ public class Lexer implements ILexer {
                             Loc_token = new IToken.SourceLocation(row, column);
                             token_ref = 0;
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.LPAREN, cht, Loc_token, 1);
                             tokenList.add(token);
                             column++;
@@ -425,7 +425,7 @@ public class Lexer implements ILexer {
                             Loc_token = new IToken.SourceLocation(row, column);
                             token_ref = 0;
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.RPAREN, cht, Loc_token, 1);
                             tokenList.add(token);
                             column++;
@@ -445,7 +445,7 @@ public class Lexer implements ILexer {
                             Loc_token = new IToken.SourceLocation(row, column);
                             token_ref = 0;
                             initPoint = currentPoint;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             Token token = new Token(IToken.Kind.NUM_LIT, cht, Loc_token, 1);
                             tokenList.add(token);
                             column++;
@@ -490,7 +490,7 @@ public class Lexer implements ILexer {
 
                         default -> {
                             sti = 0;
-                            if (Character.isJavaIdentifierStart(ch)) {
+                            if (Character.isJavaIdentifierStart(character)) {
                                 Loc_token = new IToken.SourceLocation(row, column);
                                 token_ref = 0;
                                 initPoint = currentPoint;
@@ -515,7 +515,7 @@ public class Lexer implements ILexer {
 
                 case HAVE_LT -> {
 
-                    switch (ch) {
+                    switch (character) {
 
                         case '=' -> {
                             StateNum = 0;
@@ -574,7 +574,7 @@ public class Lexer implements ILexer {
 
 //                case HAVE_EX -> {
 //
-//                    switch (ch) {
+//                    switch (character) {
 //
 ////                        case '=' -> {
 ////                            Token token = new Token(IToken.Kind.NOT_EQUALS,
@@ -603,7 +603,7 @@ public class Lexer implements ILexer {
 //                }
 
 //                case HAVE_ZERO -> {
-//                    switch (ch) {
+//                    switch (character) {
 //                        case '.' -> {
 //                            currState = STATE.HAVE_DOT;
 //                            position++;
@@ -626,7 +626,7 @@ public class Lexer implements ILexer {
 //                }
 
                 case IN_ID -> {
-                    if (Character.isJavaIdentifierPart(ch)) {
+                    if (Character.isJavaIdentifierPart(character)) {
                         token_ref = 0;
                         column++;
                         sti = 0;
@@ -665,7 +665,7 @@ public class Lexer implements ILexer {
                     }
                 }
 //                case HAVE_DOT -> {
-//                    switch (ch) {
+//                    switch (character) {
 //                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
 //                            currState = STATE.IN_FLOAT;
 //                            col++;
@@ -679,7 +679,7 @@ public class Lexer implements ILexer {
 //                }
 
                 case IN_NUM -> {
-                    switch (ch) {
+                    switch (character) {
                         case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
 //                        case '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
                             StateNum = 0;
@@ -721,7 +721,7 @@ public class Lexer implements ILexer {
                 }
                 case HAVE_GT -> {
 
-                    switch (ch) {
+                    switch (character) {
 
                         case '=' -> {
                             token_ref = 0;
@@ -772,7 +772,7 @@ public class Lexer implements ILexer {
                 }
 
 //                case IN_FLOAT -> {
-//                    switch (ch) {
+//                    switch (character) {
 //                        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
 //                            col++;
 //                            position++;
@@ -798,7 +798,7 @@ public class Lexer implements ILexer {
 
 //                case HAVE_MINUS -> {
 //
-//                    switch (ch) {
+//                    switch (character) {
 //
 //                        case '>' -> {
 //                            Token token = new Token(IToken.Kind.RARROW,
@@ -821,7 +821,7 @@ public class Lexer implements ILexer {
 //                }
                 case IN_STR -> {
 
-                    switch (ch) {
+                    switch (character) {
 
                         case '\\' -> {
                             token_ref = 0;
@@ -885,7 +885,7 @@ public class Lexer implements ILexer {
 
                 case IN_COMMENT -> {
 
-                    switch (ch) {
+                    switch (character) {
 
                         case '\n' -> {
                             token_ref = 0;
@@ -911,7 +911,7 @@ public class Lexer implements ILexer {
                 }
                 case HAVE_SLASH -> {
 
-                    switch (ch) {
+                    switch (character) {
 
                         case 'b', 't', 'n', 'f', 'r', '\\', '\'', '\"' -> {
                             token_ref = 0;
@@ -942,7 +942,7 @@ public class Lexer implements ILexer {
                 }
                 case HAVE_FSLASH -> {
 
-                    switch (ch){
+                    switch (character){
 
                         case '/' -> {
                             currentState = STATE.IN_COMMENT;
@@ -956,7 +956,7 @@ public class Lexer implements ILexer {
 //                            token_l = new IToken.SourceLocation(line, col);
 //                            System.out.println(col);
 //                            startPosition = position;
-                            char[] cht = {ch};
+                            char[] cht = {character};
                             token_ref = 0;
                             Token token = new Token(IToken.Kind.DIV, cht, Loc_token, 1);
                             StateNum = 0;
@@ -985,7 +985,7 @@ public class Lexer implements ILexer {
 
                 case IN_ASSIGN -> {
 
-                    switch (ch){
+                    switch (character){
 
                         case '=' -> {
                             StateNum = 0;
