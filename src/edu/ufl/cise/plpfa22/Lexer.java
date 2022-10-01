@@ -27,7 +27,7 @@ public class Lexer implements ILexer {
 
     public Lexer(String inputStr) {
         sti = 0;
-        this.inputStr = inputStr;
+        this.inputStr = inputStr+" ";
         StateNum=0;
         currentState = STATE.START;
 
@@ -494,7 +494,7 @@ public class Lexer implements ILexer {
                                 Loc_token = new IToken.SourceLocation(row, column);
                                 token_ref = 0;
                                 initPoint = currentPoint;
-                                System.out.println("test - *");
+//                                System.out.println("test - *");
                                 currentState = STATE.IN_ID;
                                 column++;
                                 StateNum = 0;
@@ -628,6 +628,7 @@ public class Lexer implements ILexer {
                 case IN_ID -> {
                     if (Character.isJavaIdentifierPart(character)) {
                         token_ref = 0;
+                        System.out.println(character);
                         column++;
                         sti = 0;
                         currentPoint++;
@@ -642,7 +643,7 @@ public class Lexer implements ILexer {
                             identChars[i]=ident.charAt(i);
                         }
                         sti = 0;
-                        System.out.println("col:"+ column);
+//                        System.out.println("col:"+ column);
                         for (Map.Entry<String, IToken.Kind> entry : reservedWords.entrySet()) {
                             StateNum = 0;
                             if (ident.equals(entry.getKey())) {
@@ -658,6 +659,8 @@ public class Lexer implements ILexer {
                         sti = 0;
                         Loc_token = new IToken.SourceLocation(row, column -(identChars.length));
                         StateNum = 0;
+                        System.out.println("col:"+column);
+                        System.out.println(ident);
                         Token token = new Token(IToken.Kind.IDENT, identChars, Loc_token, currentPoint - initPoint);
                         token_ref = 0;
                         currentState = STATE.START;
@@ -869,7 +872,7 @@ public class Lexer implements ILexer {
                             currentPoint++;
 //                            System.out.println(sourceCode.charAt(position));
 //                            System.out.println(position+" "+sourceCode.length());
-                            if(currentPoint==inputStr.length()-1 && inputStr.charAt(currentPoint)!='"'){
+                            if(currentPoint==inputStr.length()-2 && inputStr.charAt(currentPoint)!='"'){
                                 throw new LexicalException("Invalid escape character", Loc_token.line(),
                                         Loc_token.column());
                             }
@@ -920,7 +923,7 @@ public class Lexer implements ILexer {
                             StateNum = 0;
                             currentPoint++;
                             token_ref = 0;
-                            if(currentPoint==inputStr.length()-1 && inputStr.charAt(currentPoint)!='"'){
+                            if(currentPoint==inputStr.length()-2 && inputStr.charAt(currentPoint)!='"'){
                                 token_ref = 0;
                                 throw new LexicalException("Invalid escape character", Loc_token.line(),
                                         Loc_token.column());

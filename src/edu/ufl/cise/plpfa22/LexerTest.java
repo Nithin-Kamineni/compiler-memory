@@ -664,6 +664,307 @@ class LexerTest {
 	}
 
 
+
+	// 13 14 15 16 17 18 19 20 21 1 2 3 4
+
+
+//	Test 1 # REMOVED A SPACE
+//	String input = "0 1 2 3 4 ";
+//
+	@Test
+	void test1() throws LexicalException
+	{
+
+		String input = """
+		   0 1 2 3 4 
+				 """;
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,1);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,3);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,5);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,7);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,9);
+		checkEOF(lexer.next());
+	}
+	@Test
+	void test11() throws LexicalException
+	{
+
+		String input = "0 1 2 3 4 ";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,1);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,3);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,5);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,7);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,9);
+		checkEOF(lexer.next());
+	}
+
+
+
+
+
+
+
+//
+//	Test 2 # REMOVED A SPACE
+//	String input = "5 6 7 8 9 ";
+//
+@Test
+void test2() throws LexicalException
+{
+
+	String input = "5 6 7 8 9 ";
+
+
+	show(input);
+	ILexer lexer = getLexer(input);
+	checkToken(lexer.next(), Kind.NUM_LIT, 1,1);
+	checkToken(lexer.next(), Kind.NUM_LIT, 1,3);
+	checkToken(lexer.next(), Kind.NUM_LIT, 1,5);
+	checkToken(lexer.next(), Kind.NUM_LIT, 1,7);
+	checkToken(lexer.next(), Kind.NUM_LIT, 1,9);
+	checkEOF(lexer.next());
+}
+
+
+
+
+
+
+
+//
+//	Test 3 # REMOVED A SPACE
+//	String input = "5a a4";
+//
+	@Test
+	void test3() throws LexicalException
+	{
+
+		String input = "5a a4";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,1);
+		checkToken(lexer.next(), Kind.IDENT, 1,2);
+		checkToken(lexer.next(), Kind.IDENT, 1,4);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 4
+//	String input = "a+2 2-x";
+	@Test
+	void test4() throws LexicalException
+	{
+
+		String input = "a+2 2-x";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.IDENT, 1,1);
+		checkToken(lexer.next(), Kind.PLUS, 1,2);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,3);
+
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,5);
+		checkToken(lexer.next(), Kind.MINUS, 1,6);
+		checkToken(lexer.next(), Kind.IDENT, 1,7);
+		checkEOF(lexer.next());
+	}
+
+
+
+//	Test 13
+//	String input = "_abc _ $ a$b c_d";
+	@Test
+	void test13() throws LexicalException
+	{
+
+		String input = "_abc _ $ a$b c_d";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkIdent(lexer.next(), "_abc", 1,1);
+		checkIdent(lexer.next(), "_", 1,6);
+		checkIdent(lexer.next(), "$", 1,8);
+		checkIdent(lexer.next(), "a$b", 1,10);
+		checkIdent(lexer.next(), "c_d", 1,14);
+		checkEOF(lexer.next());
+	}
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//	Test 14
+//	String input = "_abc1 _123 _ $ ";
+//
+	@Test
+	void test14() throws LexicalException
+	{
+
+		String input = "_abc1 _123 _ $ ";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkIdent(lexer.next(), "_abc1", 1,1);
+		checkIdent(lexer.next(), "_123", 1,7);
+		checkIdent(lexer.next(), "_", 1,12);
+		checkIdent(lexer.next(), "$", 1,14);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 15
+//	String input = " TRUE FALSE TRUEFALSE FALSETRUE";
+//
+	@Test
+	void test15() throws LexicalException
+	{
+
+		String input = " TRUE FALSE TRUEFALSE FALSETRUE";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkBoolean(lexer.next(), true);
+		checkBoolean(lexer.next(), false);
+		checkIdent(lexer.next(), "TRUEFALSE", 1,13);
+		checkIdent(lexer.next(), "FALSETRUE", 1,23);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 16
+//	String input = " TRUE123 FALSEabc abcTRUE 123FALSE";
+//
+	@Test
+	void test16() throws LexicalException
+	{
+
+		String input = " TRUE123 FALSEabc abcTRUE 123FALSE";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkIdent(lexer.next(), "TRUE123", 1,2);
+		checkIdent(lexer.next(), "FALSEabc", 1,10);
+		checkIdent(lexer.next(), "abcTRUE", 1,19);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,27);
+		checkBoolean(lexer.next(), false);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 17
+//	String input = " CONST VAR PROCEDURE";
+//
+	@Test
+	void test17() throws LexicalException
+	{
+
+		String input = " CONST VAR PROCEDURE";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.KW_CONST, 1,2);
+		checkToken(lexer.next(), Kind.KW_VAR, 1,8);
+		checkToken(lexer.next(), Kind.KW_PROCEDURE, 1,12);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 18
+//	String input = " CALL BEGIN END";
+//
+	@Test
+	void test18() throws LexicalException
+	{
+
+		String input = " CALL BEGIN END";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.KW_CALL, 1,2);
+		checkToken(lexer.next(), Kind.KW_BEGIN, 1,7);
+		checkToken(lexer.next(), Kind.KW_END, 1,13);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 19
+//	String input = " IF THEN WHILE DO";
+//
+	@Test
+	void test19() throws LexicalException
+	{
+
+		String input = " IF THEN WHILE DO";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.KW_IF, 1,2);
+		checkToken(lexer.next(), Kind.KW_THEN, 1,5);
+		checkToken(lexer.next(), Kind.KW_WHILE, 1,10);
+		checkToken(lexer.next(), Kind.KW_DO, 1,16);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 20
+//	String input = " 123DO DOabc DO123 DO_";
+//
+	@Test
+	void test20() throws LexicalException
+	{
+
+		String input = " 123DO DOabc DO123 DO_";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,2);
+		checkToken(lexer.next(), Kind.KW_DO, 1,5);
+
+		checkIdent(lexer.next(), "DOabc", 1,8);
+		checkIdent(lexer.next(), "DO123", 1,14);
+		checkIdent(lexer.next(), "DO_", 1,20);
+		checkEOF(lexer.next());
+	}
+//
+//	Test 21
+//	String input = "123VAR PROCEDUREabc BEGIN123 end_";
+
+	@Test
+	void test21() throws LexicalException
+	{
+
+		String input = "123VAR PROCEDUREabc BEGIN123 end_";
+
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.NUM_LIT, 1,1);
+		checkToken(lexer.next(), Kind.KW_VAR, 1,4);
+
+		checkIdent(lexer.next(), "PROCEDUREabc", 1,8);
+		checkIdent(lexer.next(), "BEGIN123", 1,21);
+		checkIdent(lexer.next(), "end_", 1,30);
+		checkEOF(lexer.next());
+	}
+
+
+
 }
 
 
