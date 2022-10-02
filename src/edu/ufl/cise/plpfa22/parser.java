@@ -3,11 +3,10 @@ package edu.ufl.cise.plpfa22;
 //import edu.ufl.cise.plpfa22.ast.*;
 //import edu.ufl.cise.plpfa22.ast.Dimension;
 
-import edu.ufl.cise.plpfa22.ast.ASTNode;
-import edu.ufl.cise.plpfa22.ast.Expression;
-import edu.ufl.cise.plpfa22.ast.VarDec;
+import edu.ufl.cise.plpfa22.ast.*;
 
 import java.util.HashSet;
+import java.util.function.BinaryOperator;
 
 public class parser implements IParser {
     ILexer lexer;
@@ -44,9 +43,13 @@ public class parser implements IParser {
         }
     }
 
-    void expr() throws PLPException {
-        aditiveExpresion();
+    public Expression expr() throws PLPException {
+        IToken firstToken = currentToken;
+        Expression left = null;
+        Expression right = null;
+        left = aditiveExpresion();
         while (currentToken.getKind() == IToken.Kind.LT || currentToken.getKind() == IToken.Kind.GT || currentToken.getKind() == IToken.Kind.EQ || currentToken.getKind() == IToken.Kind.NEQ || currentToken.getKind() == IToken.Kind.LE || currentToken.getKind() == IToken.Kind.GE) {
+            IToken op = currentToken;
             if (currentToken.getKind() == IToken.Kind.LT) {
                 match(IToken.Kind.LT);
             } else if (currentToken.getKind() == IToken.Kind.GT) {
@@ -59,9 +62,15 @@ public class parser implements IParser {
                 match(IToken.Kind.LT);
             } else if (currentToken.getKind() == IToken.Kind.GE) {
                 match(IToken.Kind.LT);
+            } else {
+                throw new SyntaxException("expected logical and token in LogicalOrExpr");
             }
-            aditiveExpresion();
+
+            right = aditiveExpresion();
+            left = new ExpressionBinary(firstToken, left, op, right);
+
         }
+        return left;
     }
 
     void aditiveExpresion() throws PLPException {
@@ -106,9 +115,9 @@ public class parser implements IParser {
 //            }
 
             IToken firstToken = currentToken;
-            ExpresionNode E = null;
+//            ExpresionNode E = null;
             if(currentToken.getKind()==IToken.Kind.IDENT){
-                E = new IntLitExpr(firstToken);
+//                E = new IntLitExpr(firstToken);
                 match(IToken.Kind.IDENT);
             }
             else if(currentToken.getKind()==IToken.Kind.NUM_LIT || currentToken.getKind()==IToken.Kind.STRING_LIT || currentToken.getKind()==IToken.Kind.BOOLEAN_LIT){
@@ -255,77 +264,89 @@ public class parser implements IParser {
 
     ////////////////////////////////////////////////////////////////
 
-    abstract class Expression extends ASTNode {
-        public final IToken firstToken;
-        public Expression(IToken firstToken) {
-            super(firstToken);
-            this.firstToken = firstToken;
-        }
-    }
-
-    class ExpressionNumLit extends Expression {
-        public  ExpressionNumLit(IToken firstToken){
-            super(firstToken);
-        }
-        public int getValue(){
-            return firstToken.getIntValue();
-        }
-    }
-
-    class ExpressionBinary extends Expression{
-        public final Expression left;
-        public final IToken op;
-        public final Expression right;
-
-        public ExpressionBinary(IToken firstToken, Expression left, IToken op, Expression right){
-            super(firstToken);
-            this.left=left;
-            this.op=op;
-            this.right=right;
-        }
-    }
+//    abstract class Expression extends ASTNode {
+//        public final IToken firstToken;
+//        public Expression(IToken firstToken) {
+//            super(firstToken);
+//            this.firstToken = firstToken;
+//        }
+//
+//        public abstract Object visit(ASTVisitor v, Object args);
+//    }
+//
+//    class ExpressionNumLit extends Expression {
+//        public  ExpressionNumLit(IToken firstToken){
+//            super(firstToken);
+//        }
+//        public int getValue(){
+//            return firstToken.getIntValue();
+//        }
+//
+//        @Override
+//        public Object visit(ASTVisitor v, Object arg) {
+//            return v.visitExpressionNumLit(this, arg);
+//        }
+//    }
+//
+//    class ExpressionBinary extends Expression{
+//        public final Expression left;
+//        public final IToken op;
+//        public final Expression right;
+//
+//        public ExpressionBinary(IToken firstToken, Expression left, IToken op, Expression right){
+//            super(firstToken);
+//            this.left=left;
+//            this.op=op;
+//            this.right=right;
+//        }
+//        @Override
+//        public Object visit(ASTVisitor v, Object arg) {
+//            return v.visitExpressionBinary(this, arg);
+//        }
+//
+//    }
 
     ////////////////////////////////////////////////////////////////
 
-    abstract class ExpresionNode extends ASTNode {
-        public final IToken firstToken;
-
-        public ExpresionNode(IToken firstToken) {
-            super(firstToken);
-            this.firstToken = firstToken;
-        }
-    }
-
-    class additiveExp extends ASTNode {
-
-    }
-
-
-    abstract class primaryExpr extends ASTNode {
-        public final IToken firstToken;
-        public primaryExpr(IToken firstToken){
-            super(firstToken);
-            this.firstToken=firstToken;
-        }
-    }
-
-    class IdentPrimExpr extends  primaryExpr{
-        public  IdentPrimExpr(IToken firstToken){
-            super(firstToken);
-        }
-    }
-
-    class constValPrimExpr extends primaryExpr{
-        public final IToken numLitConst;
-        public final IToken strLitConst;
-        public final IToken boolLitConst;
-        public constValPrimExpr(IToken firstToken, IToken numLitConst, IToken strLitConst, IToken boolLitConst){
-            super(firstToken);
-            this.numLitConst=numLitConst;
-            this.strLitConst=strLitConst;
-            this.boolLitConst=boolLitConst;
-        }
-    }
+//    abstract class ExpresionNode extends ASTNode {
+//        public final IToken firstToken;
+//
+//        public ExpresionNode(IToken firstToken) {
+//            super(firstToken);
+//            this.firstToken = firstToken;
+//        }
+//    }
+//
+//    class additiveExp extends ASTNode {
+//
+//    }
+//
+//
+//    abstract class primaryExpr extends ASTNode {
+//        public final IToken firstToken;
+//        public primaryExpr(IToken firstToken){
+//            super(firstToken);
+//            this.firstToken=firstToken;
+//        }
+//    }
+//
+//    class IdentPrimExpr extends  primaryExpr{
+//        public  IdentPrimExpr(IToken firstToken){
+//            super(firstToken);
+//        }
+//    }
+//
+//    class constValPrimExpr extends primaryExpr{
+//        public final IToken numLitConst;
+//        public final IToken strLitConst;
+//        public final IToken boolLitConst;
+//        public constValPrimExpr(IToken firstToken, IToken numLitConst, IToken strLitConst, IToken boolLitConst){
+//            super(firstToken);
+//            this.numLitConst=numLitConst;
+//            this.strLitConst=strLitConst;
+//            this.boolLitConst=boolLitConst;
+//        }
+//    }
 
 
 
@@ -335,7 +356,7 @@ public class parser implements IParser {
     ASTNode ProgramFunc() throws PLPException {
         IToken firstToken = currentToken;
         block();
-        ProgramFunc();
+//        ProgramFunc();
 
     }
 
