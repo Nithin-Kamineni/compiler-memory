@@ -127,6 +127,32 @@ class LexerTest {
 		checkEOF(lexer.next());
 	}
 
+	@Test
+	void testblock1() throws LexicalException {
+		String input = """
+				CONST a = 3, b = TRUE, c = "hello";
+				.
+				""";
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.KW_CONST);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.EQ);
+		checkToken(lexer.next(), Kind.NUM_LIT);
+		checkToken(lexer.next(), Kind.COMMA);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.EQ);
+		checkToken(lexer.next(), Kind.BOOLEAN_LIT);
+		checkToken(lexer.next(), Kind.COMMA);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.EQ);
+		checkToken(lexer.next(), Kind.STRING_LIT);
+		checkToken(lexer.next(), Kind.SEMI);
+		checkToken(lexer.next(), Kind.DOT);
+//		checkToken(lexer.next(), Kind.MINUS, 2,1);
+		checkEOF(lexer.next());
+	}
+
 	//comments should be skipped
 	@Test
 	void testComment0() throws LexicalException {
@@ -963,7 +989,97 @@ void test2() throws LexicalException
 		checkEOF(lexer.next());
 	}
 
+	@Test
+	void parsertest() throws LexicalException
+	{
 
+		String input = """
+				CONST a=3;
+				VAR x,y,z;
+				PROCEDURE p;
+				  VAR j;
+				  BEGIN
+				     ? x;
+				     IF x = 0 THEN ! y ;
+				     WHILE j < 24 DO CALL z
+				  END;
+				! a+b - (c/e) * 35/(3+4)
+				.
+				""";
+		//! a+b - (c/e) * 35/(3+4)
+
+		show(input);
+		ILexer lexer = getLexer(input);
+		checkToken(lexer.next(), Kind.KW_CONST);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.EQ);
+		checkToken(lexer.next(), Kind.NUM_LIT);
+		checkToken(lexer.next(), Kind.SEMI);
+
+		checkToken(lexer.next(), Kind.KW_VAR);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.COMMA);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.COMMA);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.SEMI);
+
+		checkToken(lexer.next(), Kind.KW_PROCEDURE);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.SEMI);
+		checkToken(lexer.next(), Kind.KW_VAR);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.SEMI);
+		checkToken(lexer.next(), Kind.KW_BEGIN);
+		checkToken(lexer.next(), Kind.QUESTION);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.SEMI);
+
+		checkToken(lexer.next(), Kind.KW_IF);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.EQ);
+		checkToken(lexer.next(), Kind.NUM_LIT);
+		checkToken(lexer.next(), Kind.KW_THEN);
+		checkToken(lexer.next(), Kind.BANG);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.SEMI);
+
+		checkToken(lexer.next(), Kind.KW_WHILE);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.LT);
+		checkToken(lexer.next(), Kind.NUM_LIT);
+		checkToken(lexer.next(), Kind.KW_DO);
+		checkToken(lexer.next(), Kind.KW_CALL);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.KW_END);
+		checkToken(lexer.next(), Kind.SEMI);
+
+		checkToken(lexer.next(), Kind.BANG);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.PLUS);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.MINUS);
+
+		checkToken(lexer.next(), Kind.LPAREN);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.DIV);
+		checkToken(lexer.next(), Kind.IDENT);
+		checkToken(lexer.next(), Kind.RPAREN);
+
+		checkToken(lexer.next(), Kind.TIMES);
+		checkToken(lexer.next(), Kind.NUM_LIT);
+		checkToken(lexer.next(), Kind.DIV);
+		checkToken(lexer.next(), Kind.LPAREN);
+		checkToken(lexer.next(), Kind.NUM_LIT);
+		checkToken(lexer.next(), Kind.PLUS);
+		checkToken(lexer.next(), Kind.NUM_LIT);
+		checkToken(lexer.next(), Kind.RPAREN);
+
+
+		checkToken(lexer.next(), Kind.DOT);
+
+		checkEOF(lexer.next());
+	}
 
 }
 

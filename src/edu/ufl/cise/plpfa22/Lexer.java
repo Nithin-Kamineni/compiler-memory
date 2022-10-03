@@ -163,7 +163,7 @@ public class Lexer implements ILexer {
                             location = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
                             char[] cht = {character};
-                            System.out.println(character);
+//                            System.out.println(character);
                             location = new IToken.SourceLocation(row, column);
                             Token token = new Token(IToken.Kind.EQ, cht, location, 1);
                             sti = 0;
@@ -456,7 +456,7 @@ public class Lexer implements ILexer {
                         }
                         case '"' -> {
                             sti = 0;
-                            System.out.println("opening quote");
+//                            System.out.println("opening quote");
                             token_ref = 0;
                             location = new IToken.SourceLocation(row, column);
                             initPoint = currentPoint;
@@ -628,7 +628,7 @@ public class Lexer implements ILexer {
                 case IN_ID -> {
                     if (Character.isJavaIdentifierPart(character)) {
                         token_ref = 0;
-                        System.out.println(character);
+//                        System.out.println(character);
                         column++;
                         sti = 0;
                         currentPoint++;
@@ -659,8 +659,8 @@ public class Lexer implements ILexer {
                         sti = 0;
                         location = new IToken.SourceLocation(row, column -(identChars.length));
                         StateNum = 0;
-                        System.out.println("col:"+column);
-                        System.out.println(ident);
+//                        System.out.println("col:"+column);
+//                        System.out.println(ident);
                         Token token = new Token(IToken.Kind.IDENT, identChars, location, currentPoint - initPoint);
                         token_ref = 0;
                         currentState = STATE.START;
@@ -836,7 +836,7 @@ public class Lexer implements ILexer {
                         }
                         case '"' -> {
                             CompleteString = true;
-                            System.out.println("closing quotes");
+//                            System.out.println("closing quotes");
                             String temp = inputStr.substring(initPoint, currentPoint + 1);
                             char[] tempList = new char[temp.length()];
                             for (int i = 0;i<temp.length();i++){
