@@ -617,7 +617,7 @@ class ParserTest {
 		assertEquals("e", String.valueOf(v49.getText()));
 		IToken v50 = ((ExpressionBinary) v45).op;
 		System.out.println("here");
-		assertEquals("/", String.valueOf(v50.getText()));
+		assertEquals("/", String.valueOf(v50.getText())); //////////////
 		System.out.println("here2");
 		Expression v51 = ((ExpressionBinary) v44).e1;
 		assertThat("", v51, instanceOf(ExpressionNumLit.class));
@@ -638,7 +638,7 @@ class ParserTest {
 		IToken v59 = ((ExpressionBinary) v54).op;
 		assertEquals("+", String.valueOf(v59.getText()));
 		IToken v60 = ((ExpressionBinary) v43).op;
-		assertEquals("/", String.valueOf(v60.getText()));
+		assertEquals("/", String.valueOf(v60.getText())); ///////////////////
 		IToken v61 = ((ExpressionBinary) v36).op;
 		assertEquals("-", String.valueOf(v61.getText()));
 	}
@@ -876,6 +876,7 @@ class ParserTest {
 		List<ProcDec> v3 = ((Block) v0).procedureDecs;
 		assertEquals(0, v3.size());
 		Statement v4 = ((Block) v0).statement;
+
 		assertThat("", v4, instanceOf(StatementOutput.class));
 		Expression v5 = ((StatementOutput) v4).expression;
 		assertThat("", v5, instanceOf(ExpressionBinary.class));

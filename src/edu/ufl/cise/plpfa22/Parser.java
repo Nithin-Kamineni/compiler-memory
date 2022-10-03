@@ -13,6 +13,7 @@ import java.util.function.BinaryOperator;
 public class Parser implements IParser {
     ILexer lexer;
     IToken currentToken;
+    IToken firstToken;
     HashSet<IToken.Kind> ProgramSet = new HashSet();
     HashSet<IToken.Kind> BlockSet = new HashSet();
     HashSet<IToken.Kind> StatmentSet = new HashSet();
@@ -43,7 +44,7 @@ public class Parser implements IParser {
     }
 
     public Expression expr() throws PLPException {
-        IToken firstToken = currentToken;
+        firstToken = currentToken;
         Expression left = null;
         Expression right = null;
         left = aditiveExpresion();
@@ -72,7 +73,7 @@ public class Parser implements IParser {
     }
 
     Expression aditiveExpresion() throws PLPException {
-            IToken firstToken = currentToken;
+            firstToken = currentToken;
             Expression left = null;
             Expression right = null;
             left = multiplicativeExpresion();
@@ -94,22 +95,23 @@ public class Parser implements IParser {
 
 
         Expression multiplicativeExpresion() throws PLPException{
-            IToken firstToken = currentToken;
+            firstToken = currentToken;
             Expression left = null;
             Expression right = null;
             left = primaryExpresion();
-            while(currentToken.getKind()== IToken.Kind.TIMES || currentToken.getKind()== IToken.Kind.DIV || currentToken.getKind()== IToken.Kind.MOD){
-                IToken op = currentToken;
+            IToken op = null;
+            while(currentToken.getKind()== IToken.Kind.TIMES || currentToken.getKind() == IToken.Kind.DIV || currentToken.getKind()== IToken.Kind.MOD){
+                op = currentToken;
                 if(currentToken.getKind()== IToken.Kind.TIMES){
-                match(IToken.Kind.TIMES);
+                    match(IToken.Kind.TIMES);
                 }
                 else if(currentToken.getKind()== IToken.Kind.DIV){
-                match(IToken.Kind.DIV);
+                    match(IToken.Kind.DIV);
                 }
                 else if(currentToken.getKind()== IToken.Kind.MOD){
-                match(IToken.Kind.MOD);
+                    match(IToken.Kind.MOD);
                 } else {
-                throw new SyntaxException("expected logical and token in LogicalOrExpr");
+                    throw new SyntaxException("expected logical and token in LogicalOrExpr");
                 }
                 right = primaryExpresion();
                 left = new ExpressionBinary(firstToken, left, op, right);
@@ -125,7 +127,7 @@ public class Parser implements IParser {
 //                } while { currentToken.getKind() == IToken.Kind.IDENT || IToken.Kind.IDENT}
 //            }
 
-            IToken firstToken = currentToken;
+            firstToken = currentToken;
 
             if(currentToken.getKind()==IToken.Kind.IDENT){
 //                E = new IntLitExpr(firstToken);
@@ -134,7 +136,25 @@ public class Parser implements IParser {
                 return NodePE;
             }
             else if(currentToken.getKind()==IToken.Kind.NUM_LIT || currentToken.getKind()==IToken.Kind.STRING_LIT || currentToken.getKind()==IToken.Kind.BOOLEAN_LIT){
-                Expression NodePE =  constVal();
+                Expression NodePE =  null;
+                if(currentToken.getKind()== IToken.Kind.NUM_LIT){
+                    ExpressionNumLit NodeCV = new ExpressionNumLit(firstToken);
+                    match(IToken.Kind.NUM_LIT);
+                    NodePE = NodeCV;
+                }
+                else if(currentToken.getKind()== IToken.Kind.STRING_LIT){
+                    ExpressionStringLit NodeCV = new ExpressionStringLit(firstToken);
+                    match(IToken.Kind.STRING_LIT);
+                    NodePE = NodeCV;
+                }
+                else if(currentToken.getKind()== IToken.Kind.BOOLEAN_LIT){
+                    ExpressionBooleanLit NodeCV = new ExpressionBooleanLit(firstToken);
+                    match(IToken.Kind.BOOLEAN_LIT);
+                    NodePE = NodeCV;
+                }
+                else {
+                    throw new SyntaxException("expected logical and token in LogicalOrExpr");
+                }
                 return NodePE;
             }
             else if(currentToken.getKind()==IToken.Kind.LPAREN){
@@ -149,7 +169,7 @@ public class Parser implements IParser {
         }
 
         Expression constVal() throws PLPException{
-        IToken firstToken = currentToken;
+        firstToken = currentToken;
         if(currentToken.getKind()== IToken.Kind.NUM_LIT){
                 ExpressionNumLit NodeCV = new ExpressionNumLit(currentToken);
                 match(IToken.Kind.NUM_LIT);
@@ -219,7 +239,7 @@ public class Parser implements IParser {
 //    }
 
     public Statement statement() throws PLPException {
-        IToken firstToken = currentToken;
+        firstToken = currentToken;
         if (currentToken.getKind() == IToken.Kind.IDENT) {
             IToken ident1 = currentToken;
             match(IToken.Kind.IDENT);
@@ -282,7 +302,7 @@ public class Parser implements IParser {
     }
 
     public Block block() throws PLPException{
-        IToken firstToken = currentToken;
+        firstToken = currentToken;
         List<ConstDec> blockConstVals = new ArrayList<ConstDec>();
         List<VarDec> blockVar = new ArrayList<VarDec>();
         List<ProcDec> procVar = new ArrayList<ProcDec>();
@@ -471,7 +491,7 @@ public class Parser implements IParser {
 //    }
 
     ASTNode ProgramFunc() throws PLPException {
-        IToken firstToken = currentToken;
+        firstToken = currentToken;
         Block blk = block();
         Program blockNode= new Program(firstToken, blk);
         match(IToken.Kind.DOT);

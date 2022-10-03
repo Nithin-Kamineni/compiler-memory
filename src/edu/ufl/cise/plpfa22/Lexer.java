@@ -282,13 +282,10 @@ public class Lexer implements ILexer {
 //                            col++;
 //                            position++;
 //                            return token;
-                            sti = 0;
                             location = new IToken.SourceLocation(row, column);
-                            sti = 0;
                             initPoint = currentPoint;
                             currentState = STATE.HAVE_FSLASH;
                             column++;
-                            StateNum = 0;
                             currentPoint++;
                         }
 
@@ -900,7 +897,6 @@ public class Lexer implements ILexer {
                             StateNum = 0;
                             currentPoint++;
                         }
-
                         default -> {
                             token_ref = 0;
                             column++;
@@ -944,45 +940,26 @@ public class Lexer implements ILexer {
 
                 }
                 case HAVE_FSLASH -> {
-
                     switch (character){
-
                         case '/' -> {
                             currentState = STATE.IN_COMMENT;
-                            token_ref = 0;
                             column++;
-                            StateNum = 0;
                             currentPoint++;
-                            sti = 0;
                         }
                         default -> {
-//                            token_l = new IToken.SourceLocation(line, col);
-//                            System.out.println(col);
-//                            startPosition = position;
-                            char[] cht = {character};
-                            token_ref = 0;
+                            String testt123 =  inputStr.substring(initPoint, currentPoint);
+                            char[] cht = new char[testt123.length()]; //startPos - initPosition     possition - currentPos
+                            for(int i=0;i<testt123.length();i++){
+                                cht[i]=(testt123.charAt(i));
+                            }
+
                             Token token = new Token(IToken.Kind.DIV, cht, location, 1);
-                            StateNum = 0;
                             tokenList.add(token);
-                            token_ref = 0;
+                            column++;
                             currentState = STATE.START;
-                            sti = 0;
-//                            col++;
-//                            position++;
                             return token;
-
-
-//                            String temp = sourceCode.substring(startPosition, position);
-//                            char[] tempChars = new char[temp.length()];
-//                            for(int i = 0; i<temp.length();i++){
-//                                tempChars[i]=temp.charAt(i);
-//                            }
-//                            Token token = new Token(IToken.Kind.LT, tempChars,
-//                                    token_l,
-//                                    1);
-//                            currState = STATE.START;
-//                            return token;
                         }
+
                     }
                 }
 
