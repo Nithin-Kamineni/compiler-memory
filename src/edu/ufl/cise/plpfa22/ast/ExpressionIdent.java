@@ -28,6 +28,11 @@ public class ExpressionIdent extends Expression {
 				+ "]";
 	}
 
+	int nest;
+	public int getNest(){return nest;}
+	public void setNest(int nest) {
+		this.nest = nest;
+	}
 
 	public Declaration getDec() {
 		return dec;

@@ -33,4 +33,6 @@ public class ConstDec extends Declaration {
 				+ (type != null ? "type=" + type : "") + "]";
 	}
 
+
+
 }

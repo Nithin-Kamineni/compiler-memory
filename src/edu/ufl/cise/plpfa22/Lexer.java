@@ -955,7 +955,7 @@ public class Lexer implements ILexer {
 
                             Token token = new Token(IToken.Kind.DIV, cht, location, 1);
                             tokenList.add(token);
-                            column++;
+//                            column++;
                             currentState = STATE.START;
                             return token;
                         }

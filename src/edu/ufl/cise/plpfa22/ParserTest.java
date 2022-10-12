@@ -262,21 +262,21 @@ class ParserTest {
 		assertEquals(3, v1.size());
 		assertThat("", v1.get(0), instanceOf(ConstDec.class));
 		IToken v2 = ((ConstDec) v1.get(0)).ident;
-		System.out.println("came here 1");
+//		System.out.println("came here 1");
 		assertEquals("a", String.valueOf(v2.getText()));
-		System.out.println("came here 2");
+//		System.out.println("came here 2");
 		Integer v3 = (Integer) ((ConstDec) v1.get(0)).val;
-		System.out.println("came here 3");
+//		System.out.println("came here 3");
 		assertEquals(3, v3);
-		System.out.println("came here 4");
+//		System.out.println("came here 4");
 		assertThat("", v1.get(1), instanceOf(ConstDec.class));
 		IToken v4 = ((ConstDec) v1.get(1)).ident;
 		assertEquals("b", String.valueOf(v4.getText()));
-		System.out.println("came here 5");
+//		System.out.println("came here 5");
 		Boolean v5 = (Boolean) ((ConstDec) v1.get(1)).val;
 
 		assertEquals(true, v5);
-		System.out.println("came here 6");
+//		System.out.println("came here 6");
 		assertThat("", v1.get(2), instanceOf(ConstDec.class));
 		IToken v6 = ((ConstDec) v1.get(2)).ident;
 		assertEquals("c", String.valueOf(v6.getText()));
@@ -616,9 +616,9 @@ class ParserTest {
 		IToken v49 = ((ExpressionIdent) v48).firstToken;
 		assertEquals("e", String.valueOf(v49.getText()));
 		IToken v50 = ((ExpressionBinary) v45).op;
-		System.out.println("here");
+//		System.out.println("here");
 		assertEquals("/", String.valueOf(v50.getText())); //////////////
-		System.out.println("here2");
+//		System.out.println("here2");
 		Expression v51 = ((ExpressionBinary) v44).e1;
 		assertThat("", v51, instanceOf(ExpressionNumLit.class));
 		IToken v52 = ((ExpressionNumLit) v51).firstToken;

@@ -23,5 +23,10 @@ public abstract class Declaration extends ASTNode {
 		this.type = type;
 	}
 
+	int nest;
+	public int getNest(){return nest;}
+	public void setNest(int nest) {
+		this.nest = nest;
+	}
 
 }
