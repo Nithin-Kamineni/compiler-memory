@@ -7,17 +7,17 @@ import java.io.*;
 
 public class ScopeVisitor implements ASTVisitor {
 
-    int nestingLevel=0;
+    int nestingLevel=0; //
 
-    String scopeID;
+    String scopeID; //
 
-    Stack<String> ScopeStack = new Stack<String>();
+    Stack<String> ScopeStack = new Stack<String>(); //
 
-    HashMap<String, LinkedList> SymbolTab = new HashMap();
+    HashMap<String, LinkedList> SymbolTab = new HashMap(); //
 
-    List<Object> TempSymbolValue = new ArrayList<Object> ();
+    List<Object> TempSymbolValue = new ArrayList<Object> (); //
 
-    LinkedList<List> symbolValue = new LinkedList<List>();
+    LinkedList<List> symbolValue = new LinkedList<List>(); //
 
     Object lookUpAtribute;
 
@@ -84,7 +84,8 @@ public class ScopeVisitor implements ASTVisitor {
     @Override
     public Object visitProgram(Program program, Object arg) throws PLPException {
         Block block = program.block;
-        return block.visit(this, arg);
+        block.visit(this, arg);
+        return null;
     }
 
     @Override
@@ -98,7 +99,7 @@ public class ScopeVisitor implements ASTVisitor {
             TempIdent = consIdents.get(i).ident;
 
             String name = "";
-            char[] tempname = TempIdent.getText();cc
+            char[] tempname = TempIdent.getText();
             for(char c:tempname){
                 name= name+ c;
             }
@@ -127,14 +128,16 @@ public class ScopeVisitor implements ASTVisitor {
         }
         Statement statement = block1.statement;
 
-        return statement.visit(this, arg);
+        statement.visit(this, arg);
+        return null;
     }
 
     @Override
     public Object visitProcedure(ProcDec procDec, Object arg) throws PLPException {
         procDec.setNest(nestingLevel);
         enterScope();
-        return procDec.block.visit(this, arg);
+        procDec.block.visit(this, arg);
+        return null;
     }
 
     @Override
