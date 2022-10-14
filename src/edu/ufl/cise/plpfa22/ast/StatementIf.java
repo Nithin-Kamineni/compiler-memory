@@ -25,4 +25,10 @@ public class StatementIf extends Statement {
 		this.statement = statement;
 	}
 
+	@Override
+	public String toString() {
+		return "StatementIf [" + (expression != null ? "expression=" + expression + ", " : "")
+				+ (statement != null ? "statement=" + statement : "") + "]";
+	}
+
 }

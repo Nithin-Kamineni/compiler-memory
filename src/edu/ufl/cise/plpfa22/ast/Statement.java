@@ -10,7 +10,6 @@ public abstract class Statement extends ASTNode {
 
 	public Statement(IToken firstToken) {
 		super(firstToken);
-
 	}
 
 

@@ -71,6 +71,52 @@ class ScopeTest {
 		int v10 = ((ExpressionIdent) v8).getNest();
 		assertEquals(0, v10);
 		Declaration v11 = ((ExpressionIdent) v8).getDec();
+		System.out.println("here");
+		assertThat("", v11, instanceOf(ConstDec.class));
+		System.out.println("here2");
+		IToken v12 = ((ConstDec) v11).ident;
+
+		assertEquals("a", String.valueOf(v12.getText()));
+		Integer v13 = (Integer) ((ConstDec) v11).val;
+		assertEquals(3, v13);
+		int v14 = ((ConstDec) v11).getNest();
+		assertEquals(0, v14);
+	}
+
+	@Test//IF a=1 THEN b:=1         WHILE a=1 DO b:=1
+	void test01() throws PLPException {
+		String input = """
+				CONST aa=1;
+				VAR bb;
+				cvb:=1
+				.
+				""";
+		ASTNode ast = getDecoratedAST(input);
+		assertThat("", ast, instanceOf(Program.class));
+		Block v0 = ((Program) ast).block;
+		assertThat("", v0, instanceOf(Block.class));
+		List<ConstDec> v1 = ((Block) v0).constDecs;
+		assertEquals(1, v1.size());
+		assertThat("", v1.get(0), instanceOf(ConstDec.class));
+		IToken v2 = ((ConstDec) v1.get(0)).ident;
+		assertEquals("a", String.valueOf(v2.getText()));
+		Integer v3 = (Integer) ((ConstDec) v1.get(0)).val;
+		assertEquals(3, v3);
+		int v4 = ((ConstDec) v1.get(0)).getNest();
+		assertEquals(0, v4);
+		List<VarDec> v5 = ((Block) v0).varDecs;
+		assertEquals(0, v5.size());
+		List<ProcDec> v6 = ((Block) v0).procedureDecs;
+		assertEquals(0, v6.size());
+		Statement v7 = ((Block) v0).statement;
+		assertThat("", v7, instanceOf(StatementOutput.class));
+		Expression v8 = ((StatementOutput) v7).expression;
+		assertThat("", v8, instanceOf(ExpressionIdent.class));
+		IToken v9 = ((ExpressionIdent) v8).firstToken;
+		assertEquals("a", String.valueOf(v9.getText()));
+		int v10 = ((ExpressionIdent) v8).getNest();
+		assertEquals(0, v10);
+		Declaration v11 = ((ExpressionIdent) v8).getDec();
 		assertThat("", v11, instanceOf(ConstDec.class));
 		IToken v12 = ((ConstDec) v11).ident;
 		assertEquals("a", String.valueOf(v12.getText()));
