@@ -86,8 +86,8 @@ class ScopeTest {
 	@Test//IF a=1 THEN b:=1         WHILE a=1 DO b:=1
 	void test01() throws PLPException {
 		String input = """
-				CONST aa=1;
-				VAR bb;
+				CONST a=1;
+				VAR b;
 				cvb:=1
 				.
 				""";

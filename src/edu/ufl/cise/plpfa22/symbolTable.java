@@ -28,9 +28,15 @@ public class symbolTable {
         scope_stack.push(currentScope);
     }
 
-    public void addDec(String ident, Declaration dec) {
+    public void addDec(String ident, Declaration dec) throws PLPException {
         if (hash.containsKey(ident)) {
             ArrayList<Pair> l = hash.get(ident);
+//            System.out.println("here12");
+            System.out.println(l.get(0).getKey());
+            System.out.println(currentScope);
+            if(l.get(0).getKey()==currentScope){
+                throw new ScopeException("ID is not declared twice");
+            }
             l.add(new Pair(currentScope, dec));
             hash.put(ident, l);
         }else {
