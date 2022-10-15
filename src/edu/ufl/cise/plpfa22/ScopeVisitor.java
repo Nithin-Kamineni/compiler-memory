@@ -258,6 +258,8 @@ public class ScopeVisitor implements ASTVisitor {
 
     @Override
     public Object visitExpressionBinary(ExpressionBinary expressionBinary, Object arg) throws PLPException {
+        expressionBinary.e0.visit(this, arg);
+        expressionBinary.e1.visit(this, arg);
         return null;
     }
 
