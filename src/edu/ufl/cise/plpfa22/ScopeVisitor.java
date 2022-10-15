@@ -152,7 +152,7 @@ public class ScopeVisitor implements ASTVisitor {
         }
 //        Declaration tempDec = ST.lookup(name);
 //        ST.addDec(name,null);
-        System.out.println("VisitVarDec block");
+//        System.out.println("VisitVarDec block");
 //        varDec.ident.
 
         Declaration tempDec = varDec;

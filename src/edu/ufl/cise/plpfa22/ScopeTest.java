@@ -162,9 +162,9 @@ class ScopeTest {
 		int v10 = ((Ident) v8).getNest();
 		assertEquals(0, v10);
 		Declaration v11 = ((Ident) v8).getDec();
-		System.out.println("here");
+//		System.out.println("here");
 		assertThat("", v11, instanceOf(VarDec.class));
-		System.out.println("here2");
+//		System.out.println("here2");
 		IToken v12 = ((VarDec) v11).ident;
 		assertEquals("a", String.valueOf(v12.getText()));
 		int v13 = ((VarDec) v11).getNest();
