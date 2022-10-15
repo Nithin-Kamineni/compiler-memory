@@ -32,10 +32,10 @@ public class symbolTable {
         if (hash.containsKey(ident)) {
             ArrayList<Pair> l = hash.get(ident);
 //            System.out.println("here12");
-            System.out.println(l.get(0).getKey());
-            System.out.println(currentScope);
+//            System.out.println(l.get(0).getKey());
+//            System.out.println(currentScope);
             if(l.get(0).getKey()==currentScope){
-                throw new ScopeException("ID is not declared twice");
+                throw new ScopeException("ID is declared twice is the same scope");
             }
             l.add(new Pair(currentScope, dec));
             hash.put(ident, l);
@@ -51,10 +51,11 @@ public class symbolTable {
         currentScope = scope_stack.peek();
     }
 
-    public Declaration lookup(String ident) {
+    public Declaration lookup(String ident) throws PLPException{
         ArrayList<Pair> l = hash.get(ident);
         if (l == null) {
-            return null;
+            throw new ScopeException("ID is not declared");
+//            return null;
         }
 
         Declaration dec = null;
@@ -67,6 +68,9 @@ public class symbolTable {
                 }
             }
         }
+//        if(dec == null){
+//            System.out.println("error");
+//        }
         return dec;
     }
 
