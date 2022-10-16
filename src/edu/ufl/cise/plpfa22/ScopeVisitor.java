@@ -137,6 +137,10 @@ public class ScopeVisitor implements ASTVisitor {
 
         Declaration tempDec = ST.lookup(varStatname);
         expressionIdent.setNest(ST.currentScope);
+//        System.out.println(varStatname+":here:"+tempDec);
+        if(tempDec==null){
+            throw new ScopeException("ID is not declared in this scope or previous nested scopes");
+        }
         expressionIdent.setDec(tempDec);
         return null;
     }
@@ -170,10 +174,10 @@ public class ScopeVisitor implements ASTVisitor {
         String varStatname = String.valueOf(ident.firstToken.getText());
 
         ident.setNest(ST.currentScope);
-        System.out.println("ident:"+varStatname);
+//        System.out.println("ident:"+varStatname);
         Declaration tempDec = ST.lookup(varStatname);
-        System.out.println("dec:"+tempDec);
-        System.out.println("nest:"+ident.getNest());
+//        System.out.println("dec:"+tempDec);
+//        System.out.println("nest:"+ident.getNest());
 //        System.out.println(varStatname);
         if(tempDec==null){
             throw new ScopeException("ID is not declared in this scope or previous nested scopes");

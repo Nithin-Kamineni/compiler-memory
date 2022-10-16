@@ -5196,9 +5196,4 @@ class ScopeTest {
 		ASTNode ast = getDecoratedAST(input);
 		});
 	}
-
-
-
-
 }
-
