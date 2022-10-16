@@ -31,7 +31,7 @@ public class symbolTable {
     }
 
     public void closeScope() {
-        scope_stack.pop();
+        scope_stack.pop();//s
 //        currentScope--;
         currentScope = scope_stack.peek();
         currentNesting--;
