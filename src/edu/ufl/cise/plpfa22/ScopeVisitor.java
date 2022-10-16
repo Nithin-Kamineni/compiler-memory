@@ -7,80 +7,6 @@ import java.io.*;
 
 public class ScopeVisitor implements ASTVisitor {
 
-//    int nestingLevel=0; //
-
-//    String scopeID; //
-
-//    Stack<String> ScopeStack = new Stack<String>(); //
-
-//    HashMap<String, LinkedList> SymbolTab = new HashMap(); //
-
-//    List<Object> TempSymbolValue = new ArrayList<Object> (); //
-
-//    LinkedList<List> symbolValue = new LinkedList<List>(); //
-
-//    Object lookUpAtribute;
-
-
-
-//    public void enterScope(){
-//        scopeID = UUID.randomUUID().toString();
-//        ScopeStack.add(scopeID);
-//        nestingLevel++;
-//    }
-//
-//    public void closeScope(){
-//        ScopeStack.pop();
-//        nestingLevel--;
-//    }
-//
-//    public void insert(String ID, Object attributes) throws PLPException{
-////        List<Object> symbolValue = new ArrayList<Object> ();
-//        TempSymbolValue.clear();
-//        TempSymbolValue.add(scopeID);
-//        TempSymbolValue.add(attributes);
-//        if(SymbolTab.containsKey(ID)){
-//            // retrive the linked list of symbolTab key to link new symbolValue
-//            symbolValue = SymbolTab.get(ID);
-//            //searching if the element is declared twice in the same scope
-//            TempSymbolValue = symbolValue.getFirst();
-//            if(TempSymbolValue.get(0)==scopeID){
-//                throw new ScopeException("Declaring varible second time in the same scope");
-//            } else {
-//                //adding value of tempLst to retrived LinkedList
-//                symbolValue.add(TempSymbolValue);
-//                //replace the linkedList of s
-//                SymbolTab.put(ID,symbolValue);
-//            }
-//        } else{
-//            //clearing linked list
-//            symbolValue.clear();
-//            //adding value of tempLst to LinkedList
-//            symbolValue.add(TempSymbolValue);
-//            //adding linked list to value of Symbol table Key
-//            SymbolTab.put(ID,symbolValue);
-//        }
-//    }
-//
-//    public void lookUp(String ID) throws PLPException{
-//        if(SymbolTab.containsKey(ID)){
-//            symbolValue = SymbolTab.get(ID);
-//            //traversing through linked list to find each scope value
-//            for(int i=0;i<symbolValue.size();i++){
-//                TempSymbolValue = symbolValue.get(i);
-//                scopeID = (String) TempSymbolValue.get(0);
-//                for (int j=0;j<ScopeStack.size();j++){
-//                    if(ScopeStack.get(j)==scopeID){
-//                        lookUpAtribute=symbolValue.get(i).get(1);
-//                    }
-//                }
-//            }
-//
-//        } else {
-//            throw new ScopeException("ID is not declared before used");
-//        }
-//    }
-
     symbolTable ST = new symbolTable();
 
     @Override
@@ -93,84 +19,45 @@ public class ScopeVisitor implements ASTVisitor {
     @Override
     public Object visitBlock(Block block, Object arg) throws PLPException {
         Block block1 = block;
-        IToken TempIdent;
-        List<ConstDec> consIdents = block1.constDecs;  //setting nest level
+        List<ConstDec> consIdents = block1.constDecs;
         for(int i=0;i<consIdents.size();i++){
-            consIdents.get(i).setNest(ST.currentScope);
-            TempIdent = consIdents.get(i).ident;
-
-            String name = "";
-            char[] tempname = TempIdent.getText();
-            for(char c:tempname){
-                name= name+ c;
-            }
-            Declaration value = consIdents.get(i);
-            ST.addDec(name, consIdents.get(i));
+            consIdents.get(i).visit(this, arg);
         }
         List<VarDec> varIdents = block1.varDecs;
         for(int i=0;i<varIdents.size();i++){
-
-            varIdents.get(i).setNest(ST.currentScope);  //setting nest level
-//            TempIdent = varIdents.get(i).ident;
-//
-//            String name = "";
-//            char[] tempname = TempIdent.getText();
-//            for(char c:tempname){
-//                name= name + c;
-//            }
-
-
             varIdents.get(i).visit(this, arg);
         }
         List<ProcDec> procIdents = block1.procedureDecs;
         for(int i=0;i<procIdents.size();i++){
-            procIdents.get(i).setNest(ST.currentScope);              //setting nest level
             procIdents.get(i).visit(this, arg);
-            ST.closeScope();
         }
-        Statement statement = block1.statement;
-
-        statement.visit(this, arg);
+        block1.statement.visit(this, arg);
         return null;
     }
 
     @Override
     public Object visitConstDec(ConstDec constDec, Object arg) throws PLPException {
-//        constDec.setNest(ST.currentScope);
-        constDec.visit(this, arg);
+        String name = String.valueOf(constDec.ident.getText());constDec.setNest(ST.currentScope);  //setting nest level
+        ST.addDec(name, constDec);
         return null;
     }
 
     @Override
     public Object visitVarDec(VarDec varDec, Object arg) throws PLPException {
-//        varDec.setNest(ST.currentScope);
-//
-        String name = "";
-        char[] tempIdent = varDec.ident.getText();
-        for(char c:tempIdent){
-            name= name+ c;
-        }
-//        Declaration tempDec = ST.lookup(name);
-//        ST.addDec(name,null);
-//        System.out.println("VisitVarDec block");
-//        varDec.ident.
-
-        Declaration tempDec = varDec;
-        ST.addDec(name, tempDec);
-
+        String name = String.valueOf(varDec.ident.getText());
+        varDec.setNest(ST.currentScope);  //setting nest level
+        ST.addDec(name, varDec);
         return null;
     }
 
     @Override
     public Object visitProcedure(ProcDec procDec, Object arg) throws PLPException {
-        char[] tempname = procDec.ident.getText();
-        String name = "";
-        for(char c:tempname){
-            name= name+ c;
-        }
+        String name = String.valueOf(procDec.ident.getText());
         ST.addDec(name, procDec);
+        procDec.setNest(ST.currentScope);              //setting nest level
         ST.enterScope();
         procDec.block.visit(this, arg);
+        ST.closeScope();
         return null;
     }
 
@@ -178,14 +65,8 @@ public class ScopeVisitor implements ASTVisitor {
     public Object visitStatementAssign(StatementAssign statementAssign, Object arg) throws PLPException {
         Ident varStat = statementAssign.ident;
         Expression expStat = statementAssign.expression;
-        String varStatname = "";
-        char[] tempname = varStat.getText();
-        for(char c:tempname){
-            varStatname= varStatname + c;
-        }
 
-        varStat.setNest(ST.currentScope);
-        ST.addDec(varStatname, varStat.getDec());
+        varStat.visit(this, arg);
         expStat.visit(this, arg);
         return null;
     }
@@ -193,39 +74,30 @@ public class ScopeVisitor implements ASTVisitor {
     @Override
     public Object visitStatementCall(StatementCall statementCall, Object arg) throws PLPException {
         Ident callTempIdent = statementCall.ident;
-        callTempIdent.setNest(ST.currentScope);
 
-        String varStatname = "";
-        char[] tempname = callTempIdent.getText();
-        for(char c:tempname){
-            varStatname= varStatname+ c;
-        }
+        String varStatname = String.valueOf(statementCall.ident.getText());
         Declaration tempDec = ST.lookup(varStatname);
-        callTempIdent.setDec(tempDec);
+//        System.out.println("procedure varible:"+varStatname);
+//        System.out.println("procedure declaration:"+tempDec);
+//        check(tempDec!=null, statementCall, "Called procegure Not declared");
+//        callTempIdent.setNest(ST.currentScope);
+//        callTempIdent.setDec(tempDec);
         callTempIdent.visit(this, arg);
         return null;
     }
 
     @Override
     public Object visitStatementInput(StatementInput statementInput, Object arg) throws PLPException {
-        Ident tempStatInputIdent = statementInput.ident;
-        String varStatname = "";
-        char[] tempname = tempStatInputIdent.getText();
-        for(char c:tempname){
-            varStatname= varStatname+ c;
-        }
-
-        tempStatInputIdent.setNest(ST.currentScope);
+        String varStatname = String.valueOf(statementInput.ident.getText());
         Declaration tempDec = ST.lookup(varStatname);
-        tempStatInputIdent.setDec(tempDec);
-        tempStatInputIdent.visit(this, arg);
+        //type check
+        statementInput.ident.visit(this, arg);
         return null;
     }
 
     @Override
     public Object visitStatementOutput(StatementOutput statementOutput, Object arg) throws PLPException {
-        Expression tempExp = statementOutput.expression;
-        tempExp.visit(this, arg);
+        statementOutput.expression.visit(this, arg);
         return null;
     }
 
@@ -240,19 +112,15 @@ public class ScopeVisitor implements ASTVisitor {
 
     @Override
     public Object visitStatementIf(StatementIf statementIf, Object arg) throws PLPException {
-        Expression tempStatIfExp = statementIf.expression;
-        Statement tempStatmentIf = statementIf.statement;
-        tempStatIfExp.visit(this, arg);
-        tempStatmentIf.visit(this, arg);
+        statementIf.expression.visit(this,arg);
+        statementIf.statement.visit(this, arg);
         return null;
     }
 
     @Override
     public Object visitStatementWhile(StatementWhile statementWhile, Object arg) throws PLPException {
-        Expression tempStatWhileExp = statementWhile.expression;
-        Statement tempStatmentWhile = statementWhile.statement;
-        tempStatWhileExp.visit(this, arg);
-        tempStatmentWhile.visit(this, arg);
+        statementWhile.expression.visit(this, arg);
+        statementWhile.statement.visit(this, arg);
         return null;
     }
 
@@ -265,11 +133,8 @@ public class ScopeVisitor implements ASTVisitor {
 
     @Override
     public Object visitExpressionIdent(ExpressionIdent expressionIdent, Object arg) throws PLPException {
-        char[] tempExpIdent = expressionIdent.firstToken.getText();
-        String varStatname = "";
-        for(char c:tempExpIdent){
-            varStatname = varStatname+ c;
-        }
+        String varStatname = String.valueOf(expressionIdent.firstToken.getText());
+
         Declaration tempDec = ST.lookup(varStatname);
         expressionIdent.setNest(ST.currentScope);
         expressionIdent.setDec(tempDec);
@@ -284,33 +149,35 @@ public class ScopeVisitor implements ASTVisitor {
     @Override
     public Object visitExpressionNumLit(ExpressionNumLit expressionNumLit, Object arg) throws PLPException {
 //        expressionNumLit.getFirstToken();
-        expressionNumLit.visit(this, arg);
+//        expressionNumLit.visit(this, arg);
         return null;
     }
 
     @Override
     public Object visitExpressionStringLit(ExpressionStringLit expressionStringLit, Object arg) throws PLPException {
-        expressionStringLit.visit(this, arg);
+//        expressionStringLit.visit(this, arg);
         return null;
     }
 
     @Override
     public Object visitExpressionBooleanLit(ExpressionBooleanLit expressionBooleanLit, Object arg) throws PLPException {
-        expressionBooleanLit.visit(this, arg);
+//        expressionBooleanLit.visit(this, arg);
         return null;
     }
 
     @Override
     public Object visitIdent(Ident ident, Object arg) throws PLPException {
+        String varStatname = String.valueOf(ident.firstToken.getText());
+
         ident.setNest(ST.currentScope);
-
-        char[] tempIdentName = ident.firstToken.getText();
-        String varStatname = "";
-        for(char c:tempIdentName){
-            varStatname= varStatname+ c;
-        }
-
+        System.out.println("ident:"+varStatname);
         Declaration tempDec = ST.lookup(varStatname);
+        System.out.println("dec:"+tempDec);
+        System.out.println("nest:"+ident.getNest());
+//        System.out.println(varStatname);
+        if(tempDec==null){
+            throw new ScopeException("ID is not declared in this scope or previous nested scopes");
+        }
         ident.setDec(tempDec);
 //        ident.visit(this, arg);
         return null;
