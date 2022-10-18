@@ -64,8 +64,13 @@ public class ScopeVisitor implements ASTVisitor {
         if(PassNumber==0) {
             String name = String.valueOf(procDec.ident.getText());
             ST.addDec(name, procDec);
+         // 5, 6, param 16
+            procDec.setNest(ST.currentScope);              //setting nest level
+            ST.enterScope();
+            procDec.block.visit(this, arg);
+            ST.closeScope();
         }
-        if(PassNumber==1){ // 5, 6, param 16
+        else if(PassNumber==1){
             procDec.setNest(ST.currentScope);              //setting nest level
             ST.enterScope();
             procDec.block.visit(this, arg);
