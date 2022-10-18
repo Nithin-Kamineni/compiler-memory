@@ -26,7 +26,6 @@ public class Parser implements IParser {
 
 
 
-
     public Parser(ILexer lexer){
         this.lexer = lexer;
     }
