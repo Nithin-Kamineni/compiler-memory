@@ -8,11 +8,15 @@ import java.io.*;
 public class ScopeVisitor implements ASTVisitor {
 
     symbolTable ST = new symbolTable();
+    int PassNumber =0;
+
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLPException {
         Block block = program.block;
         block.visit(this, arg);
+        PassNumber++;
+//        block.visit(this, arg);
         return null;
     }
 
@@ -74,15 +78,14 @@ public class ScopeVisitor implements ASTVisitor {
     @Override
     public Object visitStatementCall(StatementCall statementCall, Object arg) throws PLPException {
         Ident callTempIdent = statementCall.ident;
+        callTempIdent.visit(this, arg);
 
         String varStatname = String.valueOf(statementCall.ident.getText());
         Declaration tempDec = ST.lookup(varStatname);
-//        System.out.println("procedure varible:"+varStatname);
-//        System.out.println("procedure declaration:"+tempDec);
-//        check(tempDec!=null, statementCall, "Called procegure Not declared");
+
 //        callTempIdent.setNest(ST.currentScope);
 //        callTempIdent.setDec(tempDec);
-        callTempIdent.visit(this, arg);
+
         return null;
     }
 
