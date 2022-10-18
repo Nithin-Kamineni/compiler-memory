@@ -283,14 +283,14 @@ public class Parser implements IParser {
             match(IToken.Kind.KW_END);
             return new StatementBlock(firstToken ,statementsLst);
         } else if (currentToken.getKind() == IToken.Kind.KW_IF) {
-            System.out.println("IF");
+//            System.out.println("IF");
             match(IToken.Kind.KW_IF);
             Expression ex3 = expr();
             match(IToken.Kind.KW_THEN);
             Statement st2 = statement();
             return new StatementIf(firstToken, ex3, st2);
         } else if (currentToken.getKind() == IToken.Kind.KW_WHILE) {
-            System.out.println("WHILE");
+//            System.out.println("WHILE");
             match(IToken.Kind.KW_WHILE);
             Expression ex4 = expr();
             match(IToken.Kind.KW_DO);

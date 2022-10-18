@@ -4,37 +4,74 @@ import edu.ufl.cise.plpfa22.ast.*;
 import java.util.*;
 
 public class symbolTable {
-    static final boolean doPrint = true;
     String scopeId;
-
-    private void show(Object input) {
-        if (doPrint) {
-            System.out.println(input.toString());
-        }
-    }
+    int k;
+    int test;
 
     Stack<String> scope_stack = new Stack<>(); //keeps track of scope number;
+    List<String> scopeList = new ArrayList<>();
+
+    class Pair{
+        String scopeId;
+        Declaration tempDec;
+        int scopeLevel;
+
+        public Pair(String scopeId, int scopeLevel, Declaration decTemp) {
+            this.scopeId = scopeId;
+            this.scopeLevel = scopeLevel;
+            this.tempDec = decTemp;
+        }
+
+        public String getKey() {
+            return scopeId;
+        }
+
+        public int getScopeLvl() {
+            return scopeLevel;
+        }
+
+        public Declaration getValue() {
+            return tempDec;
+        }
+    }
 
     Hashtable<String, ArrayList<Pair>> hash = new Hashtable<String, ArrayList<Pair>>(); // maps identifiers with corresponding scope numbers
     int currentScope;
 
     public symbolTable() {
+        test=0;
         this.scope_stack = new Stack<String>();
         this.hash = new Hashtable<String, ArrayList<Pair>>();
         this.currentScope = 0;
+        test=0;
         this.scopeId = UUID.randomUUID().toString();
+        test=0;
+        scope_stack.push(scopeId);
+    }
+
+    public void enterScopeFirst() {
+        currentScope++;
+        scopeId = UUID.randomUUID().toString();
+        test=0;
+        scopeList.add(scopeId);
+        test=0;
         scope_stack.push(scopeId);
     }
 
     public void enterScope() {
         currentScope++;
-        scopeId = UUID.randomUUID().toString();
+        test=0;
+        scopeId = scopeList.get(k++);
+        test=0;
         scope_stack.push(scopeId);
     }
 
+
     public void closeScope() {
         currentScope--;
+        test=0;
         scope_stack.pop();
+        test=0;
         scopeId = scope_stack.peek();
     }
 
@@ -47,7 +84,6 @@ public class symbolTable {
                 }
             }
 
-//            scopeId = UUID.randomUUID().toString();
             l.add(new Pair(scopeId, currentScope, dec));
             hash.put(ident, l);
         }else {
@@ -74,47 +110,6 @@ public class symbolTable {
             }
         }
         return dec;
-    }
-
-//    public boolean duplicate(String name) {
-//        ArrayList<Pair> l = hash.get(name);
-//        if (l == null) {
-//            show("l == null");
-//            return false;
-//        }
-//
-//        show("currentScope: " + currentScope);
-//        for (Pair p: l) {
-//            show("p.getKey(): " + p.getKey());
-////            if (p.getKey() == l) {
-////                return true;
-////            }
-//        }
-//        return false;
-//    }
-
-    class Pair{
-        String scopeId;
-        Declaration d;
-        int scopeLevel;
-
-        public Pair(String scopeId, int scopeLevel, Declaration d) {
-            this.scopeId = scopeId;
-            this.scopeLevel = scopeLevel;
-            this.d = d;
-        }
-
-        public String getKey() {
-            return scopeId;
-        }
-
-        public int getScopeLvl() {
-            return scopeLevel;
-        }
-
-        public Declaration getValue() {
-            return d;
-        }
     }
 
 }

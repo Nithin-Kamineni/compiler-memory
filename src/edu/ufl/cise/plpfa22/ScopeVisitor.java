@@ -9,7 +9,7 @@ public class ScopeVisitor implements ASTVisitor {
 
     symbolTable ST = new symbolTable();
     int PassNumber =0;
-
+    String scopeId = UUID.randomUUID().toString();
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLPException {
@@ -66,7 +66,7 @@ public class ScopeVisitor implements ASTVisitor {
             ST.addDec(name, procDec);
          // 5, 6, param 16
             procDec.setNest(ST.currentScope);              //setting nest level
-            ST.enterScope();
+            ST.enterScopeFirst();
             procDec.block.visit(this, arg);
             ST.closeScope();
         }
@@ -95,10 +95,13 @@ public class ScopeVisitor implements ASTVisitor {
             Ident callTempIdent = statementCall.ident;
             callTempIdent.visit(this, arg);
             String varStatname = String.valueOf(statementCall.ident.getText());
+
             Declaration tempDec = ST.lookup(varStatname);
+
+            if (tempDec == null) {
+                throw new ScopeException("ID is not declared in this scope or previous nested scopes");
+            }
         }
-//        callTempIdent.setNest(ST.currentScope);
-//        callTempIdent.setDec(tempDec);
 
         return null;
     }
@@ -109,6 +112,9 @@ public class ScopeVisitor implements ASTVisitor {
             String varStatname = String.valueOf(statementInput.ident.getText());
             Declaration tempDec = ST.lookup(varStatname);
             //type check
+            if (tempDec == null) {
+                throw new ScopeException("ID is not declared in this scope or previous nested scopes");
+            }
             statementInput.ident.visit(this, arg);
         }
         return null;
