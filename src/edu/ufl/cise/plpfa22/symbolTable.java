@@ -100,8 +100,8 @@ public class symbolTable {
         }
 
         Declaration dec = null;
-        for (Pair p: l) {
-            for(int i=0;i<scope_stack.size();i++){
+         for(int i=0;i<scope_stack.size();i++){
+             for (Pair p: l) {
 //                System.out.println("out:"+ident);
                 if(scope_stack.get(i)==p.getKey()){
 //                    System.out.println("in:"+ident);
