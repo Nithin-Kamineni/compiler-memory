@@ -8,25 +8,21 @@ import edu.ufl.cise.plpfa22.IToken;
 import edu.ufl.cise.plpfa22.ast.Types.Type;
 
 public abstract class Declaration extends ASTNode {
-	
-	Type type;
 
 	public Declaration(IToken firstToken) {
 		super(firstToken);
 	}
 
+	Type type;
 	public Type getType() {
 		return type;
 	}
-
 	public void setType(Type type) {
 		this.type = type;
 	}
 
 	int nest;
 	public int getNest(){return nest;}
-	public void setNest(int nest) {
-		this.nest = nest;
-	}
+	public void setNest(int nest) { this.nest = nest; }
 
 }

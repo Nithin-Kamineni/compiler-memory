@@ -212,7 +212,6 @@ public class ScopeVisitor implements ASTVisitor {
             }
             ident.setDec(tempDec);
         }
-//        ident.visit(this, arg);
         return null;
     }
 }
