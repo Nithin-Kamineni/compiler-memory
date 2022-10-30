@@ -550,4 +550,21 @@ END
 """;
         runTest(input,testInfo);
     }
+
+    @Test
+    void testchanger(TestInfo testInfo) throws PLPException{ //priority
+        String input = """
+CONST a="hello", b =1, c=TRUE;
+CONST d=0;
+VAR x,y,zes;
+BEGIN
+//!y;
+x := a;
+y := x+y+zes;
+//z := 0
+END
+.
+""";
+        runTest(input,testInfo);
+    }
 }
