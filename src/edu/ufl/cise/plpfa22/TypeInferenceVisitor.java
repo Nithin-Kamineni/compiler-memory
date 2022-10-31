@@ -166,7 +166,6 @@ public class TypeInferenceVisitor implements ASTVisitor {
 
     @Override
     public Object visitStatementInput(StatementInput statementInput, Object arg) throws PLPException {
-        System.out.println("ttttttttttttt");
         System.out.println(statementInput.ident.getDec().getType());
         if (statementInput.ident.getDec().getType()==null) {
             throw new TypeCheckException("ID not declared");
