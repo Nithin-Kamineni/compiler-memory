@@ -232,93 +232,120 @@ public class TypeInferenceVisitor implements ASTVisitor {
         Types.Type tempType = null;
         String tempId;
         switch (opStr) {
-            case "*", "/" -> {
+            case "*" -> {
 //                check(lType == Type.BOOLEAN && rType == Type.BOOLEAN, binaryExpr, "Booleans required");
-                if(left.getType()==right.getType() && left.getType()!=Types.Type.PROCEDURE && left.getType()!=null){
+                if (left.getType() == null && right.getType() == null) {
+                    throw new TypeCheckException("both types are null to: " + opStr);
+                } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING)) {
+                    if (left.getType() != null && right.getType() == null) {
+                        right.setType(left.getType());
+                        tempType = left.getType();
+                    } else if (left.getType() == null && right.getType() != null) {
+                        left.setType(right.getType());
+                        tempType = right.getType();
+                    }
+                } else if (left.getType() == right.getType() && left.getType() != Types.Type.PROCEDURE && left.getType() != Types.Type.STRING && left.getType() != null) {
                     tempType = left.getType();
-                }
-                else {
+                } else {
                     throw new TypeCheckException("Types are not compatible1");
                 }
             }
             case "+" -> {
-                if((left.getType()!=null && right.getType()==null && left.getType()!=Types.Type.PROCEDURE && left.getType()!=Types.Type.BOOLEAN) || (left.getType()==null && right.getType()!=null && right.getType()!=Types.Type.PROCEDURE && right.getType()!=Types.Type.BOOLEAN)){
-                    if(left.getType()!=null && right.getType()==null){
+                if (left.getType() == null && right.getType() == null) {
+                    throw new TypeCheckException("both types are null to: " + opStr);
+                } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE)) {
+                    if (left.getType() != null && right.getType() == null) {
                         right.setType(left.getType());
-                        tempType=left.getType();
+                        tempType = left.getType();
 
                         // remo String.valueOf(right.firstToken.getText());
                         RnestLvl = (int) expressionBinary.e1.visit(this, arg);
-                        System.out.println("nest"+RnestLvl);
+                        System.out.println("nest" + RnestLvl);
                         nestSet = varNest.get(Integer.toString(RnestLvl));
                         nestSet.remove(String.valueOf(right.firstToken.getText()));
-                        varNest.put(Integer.toString(RnestLvl),nestSet);
-                    }
-                    else if(left.getType()==null && right.getType()!=null){
+                        varNest.put(Integer.toString(RnestLvl), nestSet);
+                    } else if (left.getType() == null && right.getType() != null) {
                         left.setType(right.getType());
-                        tempType=right.getType();
+                        tempType = right.getType();
 
                         LnestLvl = (int) expressionBinary.e0.visit(this, arg);
-                        System.out.println("nest"+LnestLvl);
+                        System.out.println("nest" + LnestLvl);
                         nestSet = varNest.get(Integer.toString(LnestLvl));
                         nestSet.remove(String.valueOf(left.firstToken.getText()));
-                        varNest.put(Integer.toString(LnestLvl),nestSet);
+                        varNest.put(Integer.toString(LnestLvl), nestSet);
                     }
-                }
-                else if(left.getType()==right.getType() && left.getType()!= Types.Type.BOOLEAN && left.getType()!=Types.Type.PROCEDURE){
+                } else if (left.getType() == right.getType() && left.getType() != Types.Type.PROCEDURE) {
                     tempType = left.getType();
-                }
-                else {
+                } else {
                     throw new TypeCheckException("Types are not compatible2");
                 }
             }
-            case "-" -> {
-                if((left.getType()!=null && right.getType()==null && left.getType()!=Types.Type.PROCEDURE && left.getType()!=Types.Type.BOOLEAN && left.getType()!=Types.Type.STRING) || (left.getType()==null && right.getType()!=null && right.getType()!=Types.Type.PROCEDURE && right.getType()!=Types.Type.BOOLEAN && right.getType()!=Types.Type.STRING)){
-                    if(left.getType()!=null && right.getType()==null){
+            case "-", "/", "%" -> {
+                if (left.getType() == null && right.getType() == null) {
+                    throw new TypeCheckException("both types are null to: " + opStr);
+                } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && left.getType() != Types.Type.BOOLEAN && left.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.BOOLEAN && right.getType() != Types.Type.STRING)) {
+                    if (left.getType() != null && right.getType() == null) {
                         right.setType(left.getType());
-                        tempType=left.getType();
+                        tempType = left.getType();
 
                         RnestLvl = (int) expressionBinary.e1.visit(this, arg);
-                        System.out.println("nest"+RnestLvl);
+                        System.out.println("nest" + RnestLvl);
                         nestSet = varNest.get(Integer.toString(RnestLvl));
                         nestSet.remove(String.valueOf(right.firstToken.getText()));
-                        varNest.put(Integer.toString(RnestLvl),nestSet);
-                    }
-                    else if(left.getType()==null && right.getType()!=null){
+                        varNest.put(Integer.toString(RnestLvl), nestSet);
+                    } else if (left.getType() == null && right.getType() != null) {
                         left.setType(right.getType());
-                        tempType=right.getType();
+                        tempType = right.getType();
 
                         LnestLvl = (int) expressionBinary.e0.visit(this, arg);
-                        System.out.println("nest"+LnestLvl);
+                        System.out.println("nest" + LnestLvl);
                         nestSet = varNest.get(Integer.toString(LnestLvl));
                         nestSet.remove(String.valueOf(left.firstToken.getText()));
-                        varNest.put(Integer.toString(LnestLvl),nestSet);
+                        varNest.put(Integer.toString(LnestLvl), nestSet);
                     }
-                }
-                else if(left.getType()==right.getType() && left.getType()!= Types.Type.BOOLEAN && left.getType()!= Types.Type.STRING && left.getType()!=Types.Type.PROCEDURE){
+
+                } else if (left.getType() == right.getType() && left.getType() != Types.Type.BOOLEAN && left.getType() != Types.Type.STRING && left.getType() != Types.Type.PROCEDURE) {
                     tempType = left.getType();
-                }
-                else {
+                } else {
                     throw new TypeCheckException("Types are not compatible3");
                 }
             }
             case "=" -> {
-                if(left.getType()==null && right.getType()==null){
+                if (left.getType() == null && right.getType() == null) {
                     throw new TypeCheckException("both types are null to compare");
+                } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE)) {
+                    if (left.getType() != null && right.getType() == null) {
+                        right.setType(left.getType());
+                        tempType = Types.Type.BOOLEAN;
+
+                        // remo String.valueOf(right.firstToken.getText());
+                        RnestLvl = (int) expressionBinary.e1.visit(this, arg);
+                        System.out.println("nest" + RnestLvl);
+                        nestSet = varNest.get(Integer.toString(RnestLvl));
+                        nestSet.remove(String.valueOf(right.firstToken.getText()));
+                        varNest.put(Integer.toString(RnestLvl), nestSet);
+                    } else if (left.getType() == null && right.getType() != null) {
+                        left.setType(right.getType());
+                        tempType = Types.Type.BOOLEAN;
+
+                        LnestLvl = (int) expressionBinary.e0.visit(this, arg);
+                        System.out.println("nest" + LnestLvl);
+                        nestSet = varNest.get(Integer.toString(LnestLvl));
+                        nestSet.remove(String.valueOf(left.firstToken.getText()));
+                        varNest.put(Integer.toString(LnestLvl), nestSet);
+                    } else if (left.getType() == right.getType() && left.getType() != null && left.getType() != Types.Type.PROCEDURE) {
+                        tempType = Types.Type.BOOLEAN;
+                    } else {
+                        throw new TypeCheckException("Types are not compatible4");
+                    }
                 }
-                else if(left.getType()==right.getType() && left.getType()!=null && left.getType()!=Types.Type.PROCEDURE){
-                    tempType = Types.Type.BOOLEAN;
-                }
-                else {
-                    throw new TypeCheckException("Types are not compatible4");
-                }
+
             }
-
         }
-
 
         expressionBinary.setType(tempType);
         return LnestLvl;
+
     }
 
     @Override
