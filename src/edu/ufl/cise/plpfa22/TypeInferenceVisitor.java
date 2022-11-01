@@ -26,15 +26,15 @@ public class TypeInferenceVisitor implements ASTVisitor {
         while(typeFail && notCompleteType){
             numChanges=0;
             program.block.visit(this, arg);
-
+            System.out.println("numChanges: "+numChanges);
             if(numChanges==0){
                 notCompleteType=false;
                 break;
             }
-            break;
         }
+        System.out.println("$$$$$$$$$final pass started$$$$$$$$$");
         finalPass=true;
-//        program.block.visit(this, arg);
+        program.block.visit(this, arg);
 
         return null;
     }
@@ -106,7 +106,11 @@ public class TypeInferenceVisitor implements ASTVisitor {
 
     @Override
     public Object visitProcedure(ProcDec procDec, Object arg) throws PLPException {
-        procDec.setType(Types.Type.PROCEDURE);
+        if(procDec.getType()!=Types.Type.PROCEDURE){
+            System.out.println("0000000000000000000000");
+            numChanges++;
+            procDec.setType(Types.Type.PROCEDURE);
+        }
         nestLvl=procDec.getNest();
         System.out.println("test:"+nestLvl);
         nestSet.clear();
@@ -135,6 +139,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
         }
         else if(tempDec.getType()==null){
             if(tempTyp.getType()!=null){
+                System.out.println("#################################");
                 numChanges++;
             }
             tempDec.setType(tempTyp.getType());
@@ -146,6 +151,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
         }
         //below else if could be a wrong statment aaaa
         else if(tempDec.getType()!=null && tempTyp.getType()==null){
+            System.out.println("1111111111111111111111111");
             numChanges++;
             tempTyp.setType(tempDec.getType());
 
@@ -197,7 +203,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
         if(statementOutput.expression.getType()==null && finalPass){
             throw new TypeCheckException("Don't have a type before outputting");
         }
-        else if(statementOutput.expression.getType()== Types.Type.PROCEDURE){
+        else if(statementOutput.expression.getType()==Types.Type.PROCEDURE){
             throw new TypeCheckException("ID declared is a procedure");
         }
         //System.out.println(statementOutput.expression.getType());
@@ -259,13 +265,17 @@ public class TypeInferenceVisitor implements ASTVisitor {
                     throw new TypeCheckException("both types are null to: " + opStr);
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING)) {
                     if (left.getType() != null && right.getType() == null) {
+                        System.out.println("22222222222222222222222222");
+                        numChanges++;
                         right.setType(left.getType());
                         tempType = left.getType();
                     } else if (left.getType() == null && right.getType() != null) {
+                        System.out.println("333333333333333333333333333");
+                        numChanges++;
                         left.setType(right.getType());
                         tempType = right.getType();
                     }
-                } else if (left.getType() == right.getType() && left.getType() != Types.Type.PROCEDURE && left.getType() != Types.Type.STRING && left.getType() != null) {
+                } else if (left.getType() == right.getType() && left.getType() != Types.Type.PROCEDURE && left.getType() != Types.Type.STRING) {
                     tempType = left.getType();
                 } else {
                     throw new TypeCheckException("Types are not compatible1");
@@ -276,6 +286,8 @@ public class TypeInferenceVisitor implements ASTVisitor {
                     throw new TypeCheckException("both types are null to: " + opStr);
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE)) {
                     if (left.getType() != null && right.getType() == null) {
+                        System.out.println("444444444444444444444444");
+                        numChanges++;
                         right.setType(left.getType());
                         tempType = left.getType();
 
@@ -286,6 +298,8 @@ public class TypeInferenceVisitor implements ASTVisitor {
                         nestSet.remove(String.valueOf(right.firstToken.getText()));
                         varNest.put(Integer.toString(RnestLvl), nestSet);
                     } else if (left.getType() == null && right.getType() != null) {
+                        System.out.println("5555555555555555555555");
+                        numChanges++;
                         left.setType(right.getType());
                         tempType = right.getType();
 
@@ -306,6 +320,8 @@ public class TypeInferenceVisitor implements ASTVisitor {
                     throw new TypeCheckException("both types are null to: " + opStr);
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && left.getType() != Types.Type.BOOLEAN && left.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.BOOLEAN && right.getType() != Types.Type.STRING)) {
                     if (left.getType() != null && right.getType() == null) {
+                        System.out.println("66666666666666666");
+                        numChanges++;
                         right.setType(left.getType());
                         tempType = left.getType();
 
@@ -315,6 +331,8 @@ public class TypeInferenceVisitor implements ASTVisitor {
                         nestSet.remove(String.valueOf(right.firstToken.getText()));
                         varNest.put(Integer.toString(RnestLvl), nestSet);
                     } else if (left.getType() == null && right.getType() != null) {
+                        System.out.println("77777777777777777777777");
+                        numChanges++;
                         left.setType(right.getType());
                         tempType = right.getType();
 
@@ -336,6 +354,8 @@ public class TypeInferenceVisitor implements ASTVisitor {
                     throw new TypeCheckException("both types are null to compare");
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE)) {
                     if (left.getType() != null && right.getType() == null) {
+                        System.out.println("8888888888888888888888888888");
+                        numChanges++;
                         right.setType(left.getType());
                         tempType = Types.Type.BOOLEAN;
 
@@ -346,6 +366,8 @@ public class TypeInferenceVisitor implements ASTVisitor {
                         nestSet.remove(String.valueOf(right.firstToken.getText()));
                         varNest.put(Integer.toString(RnestLvl), nestSet);
                     } else if (left.getType() == null && right.getType() != null) {
+                        System.out.println("999999999999999999999999");
+                        numChanges++;
                         left.setType(right.getType());
                         tempType = Types.Type.BOOLEAN;
 
@@ -364,9 +386,26 @@ public class TypeInferenceVisitor implements ASTVisitor {
             }
         }
 
-        expressionBinary.setType(tempType);
+        if(expressionBinary.getType()==null){
+            expressionBinary.setType(tempType);
+        }
+        else if(expressionBinary.getType()==null && tempType!=null){
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            numChanges++;
+            expressionBinary.setType(tempType);
+        }
+        else if(expressionBinary.getType()==tempType){
+            expressionBinary.setType(tempType);
+        }
+        else if(expressionBinary.getType()!=null && tempType==null){
+            tempType=expressionBinary.getType();
+        }
+        else if(expressionBinary.getType()!=tempType){
+            System.out.println(expressionBinary.getType());
+            System.out.println(tempType);
+            throw new TypeCheckException("Type of sub expression cannot be compatible to inferred type of expression");
+        }
         return LnestLvl;
-
     }
 
     @Override
@@ -376,7 +415,21 @@ public class TypeInferenceVisitor implements ASTVisitor {
             System.out.println("Not Same nest level");
         }
         Declaration dec = expressionIdent.getDec();
-        expressionIdent.setType(dec.getType());
+        if(expressionIdent.getType()==null){
+            expressionIdent.setType(dec.getType());
+        }
+        else if(expressionIdent.getType()!=null && dec.getType()==null){
+            dec.setType(expressionIdent.getType());
+        }
+        else if (expressionIdent.getType()==dec.getType()){
+            expressionIdent.setType(dec.getType());
+        }
+        else{
+//            System.out.println(expressionIdent.getType());
+//            System.out.println(dec.getType());
+            throw new TypeCheckException("Type of Ident cannot be compatible to inferred type of Ident");
+        }
+
 
         return expressionIdent.getNest();
     }

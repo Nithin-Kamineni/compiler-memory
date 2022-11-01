@@ -99,7 +99,7 @@ VAR abc; //never used, so this is legal
         runTest(input, testInfo);
     }
     @Test
-    void insufficientTypeInfo(TestInfo testInfo) throws PLPException{ //priority
+    void insufficientTypeInfo(TestInfo testInfo) throws PLPException{
         String input = """
 VAR abc;
 ! abc
@@ -129,7 +129,7 @@ END
         runTest(input, testInfo);
     }
     @Test
-    void error_assignment0(TestInfo testInfo) throws PLPException{ //priority
+    void error_assignment0(TestInfo testInfo) throws PLPException{
         String input = """
 VAR x,y,z;
 BEGIN
@@ -143,7 +143,7 @@ END
         runTest(input, testInfo, TypeCheckException.class);
     }
     @Test
-    void error_assignment1(TestInfo testInfo) throws PLPException{ //priority
+    void error_assignment1(TestInfo testInfo) throws PLPException{
         String input = """
 VAR x,y,z;
 BEGIN
@@ -169,7 +169,7 @@ END
         runTest(input, testInfo);
     }
     @Test
-    void error_notEnoughTypeInfo0(TestInfo testInfo) throws PLPException{ //priority
+    void error_notEnoughTypeInfo0(TestInfo testInfo) throws PLPException{
         String input = """
 CONST a=3;
 VAR x,y,z;
@@ -186,7 +186,7 @@ PROCEDURE p;
         runTest(input, testInfo, TypeCheckException.class);
     }
     @Test
-    void error_notEnoughTypeInfo1(TestInfo testInfo) throws PLPException{ //priority
+    void error_notEnoughTypeInfo1(TestInfo testInfo) throws PLPException{
         String input = """
 VAR x,y,z;
 PROCEDURE p;
@@ -278,7 +278,7 @@ PROCEDURE q;
         runTest(input,testInfo);
     }
     @Test
-    void error_assigntoconstant(TestInfo testInfo) throws PLPException{ //priority
+    void error_assigntoconstant(TestInfo testInfo) throws PLPException{
         String input = """
 CONST a=3;
 CONST b="String", c=TRUE;
@@ -294,7 +294,7 @@ c:=FALSE
 """;
         runTest(input, testInfo, TypeCheckException.class);
     }
-    @Test
+    @Test //infinite loop
     void testIfThen(TestInfo testInfo) throws PLPException{
         String input = """
 CONST a=3;
@@ -312,7 +312,7 @@ c:=FALSE
     }
 
 
-    @Test
+    @Test //infinite loop1
     void testIfThen1(TestInfo testInfo) throws PLPException{
         String input = """
 CONST abc=3;
@@ -387,7 +387,7 @@ CALL p
         runTest(input, testInfo, TypeCheckException.class);
     }
     @Test
-    void error_ifThenAssignToConstant(TestInfo testInfo) throws PLPException{ //priority
+    void error_ifThenAssignToConstant(TestInfo testInfo) throws PLPException{
         String input = """
 CONST d=2 , e=34, f=34, g="TRUE";
 VAR a,b,c;
@@ -446,7 +446,7 @@ END
     }
 
     @Test
-    void binaryExpression1(TestInfo testInfo) throws PLPException{
+    void binaryExpression1(TestInfo testInfo) throws PLPException{ //priority
         String input = """
 CONST d=2 , e=34, f=34, g="TRUE";
 VAR a,b,c;
@@ -524,8 +524,8 @@ END
 """;
         runTest(input,testInfo);
     }
-    @Test
-    void expressionsOnStrings0(TestInfo testInfo) throws PLPException{ //priority
+    @Test //infinite no loop
+    void expressionsOnStrings0(TestInfo testInfo) throws PLPException{
         String input = """
 CONST a = "hello";
 VAR x,y,z;
@@ -537,8 +537,8 @@ END
 """;
         runTest(input,testInfo);
     }
-    @Test
-    void expressionsOnStrings1(TestInfo testInfo) throws PLPException{ //priority
+    @Test //infinite no loop
+    void expressionsOnStrings1(TestInfo testInfo) throws PLPException{
         String input = """
 CONST a = "hello";
 VAR x,y,z;
@@ -553,7 +553,7 @@ END
     }
 
     @Test
-    void testchanger(TestInfo testInfo) throws PLPException{ //priority
+    void testchanger(TestInfo testInfo) throws PLPException{
         String input = """
 CONST a="hello", b =1, c=TRUE;
 CONST d=0;
