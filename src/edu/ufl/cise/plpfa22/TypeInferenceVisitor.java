@@ -263,6 +263,10 @@ public class TypeInferenceVisitor implements ASTVisitor {
 //                check(lType == Type.BOOLEAN && rType == Type.BOOLEAN, binaryExpr, "Booleans required");
                 if (left.getType() == null && right.getType() == null && finalPass) {
                     throw new TypeCheckException("both types are null to: " + opStr);
+                } else if(left.getType() == null && right.getType() == null && expressionBinary.getType()!=null){
+                    numChanges++; //$$$$$$4444
+                    left.setType(expressionBinary.getType());
+                    right.setType(expressionBinary.getType());
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING)) {
                     if (left.getType() != null && right.getType() == null) {
                         System.out.println("22222222222222222222222222");
@@ -283,7 +287,13 @@ public class TypeInferenceVisitor implements ASTVisitor {
             }
             case "+" -> {
                 if (left.getType() == null && right.getType() == null && finalPass) {
+                    System.out.println(expressionBinary.getType());
+                    //4444 infer the types of idents based on the type of the expression
                     throw new TypeCheckException("both types are null to: " + opStr);
+                } else if(left.getType() == null && right.getType() == null && expressionBinary.getType()!=null){
+                    numChanges++;
+                    left.setType(expressionBinary.getType());
+                    right.setType(expressionBinary.getType());
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE)) {
                     if (left.getType() != null && right.getType() == null) {
                         System.out.println("444444444444444444444444");
@@ -318,6 +328,10 @@ public class TypeInferenceVisitor implements ASTVisitor {
             case "-", "/", "%" -> {
                 if (left.getType() == null && right.getType() == null && finalPass) {
                     throw new TypeCheckException("both types are null to: " + opStr);
+                } else if(left.getType() == null && right.getType() == null && expressionBinary.getType()!=null){
+                    numChanges++;
+                    left.setType(expressionBinary.getType());
+                    right.setType(expressionBinary.getType());
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && left.getType() != Types.Type.BOOLEAN && left.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.BOOLEAN && right.getType() != Types.Type.STRING)) {
                     if (left.getType() != null && right.getType() == null) {
                         System.out.println("66666666666666666");
