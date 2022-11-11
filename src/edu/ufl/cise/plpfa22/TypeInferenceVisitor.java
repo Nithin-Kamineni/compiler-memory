@@ -26,13 +26,13 @@ public class TypeInferenceVisitor implements ASTVisitor {
         while(typeFail && notCompleteType){
             numChanges=0;
             program.block.visit(this, arg);
-            System.out.println("numChanges: "+numChanges);
+//            System.out.println("numChanges: "+numChanges);
             if(numChanges==0){
                 notCompleteType=false;
                 break;
             }
         }
-        System.out.println("$$$$$$$$$final pass started$$$$$$$$$");
+//        System.out.println("$$$$$$$$$final pass started$$$$$$$$$");
         finalPass=true;
         program.block.visit(this, arg);
 
@@ -121,7 +121,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
 
     @Override
     public Object visitStatementAssign(StatementAssign statementAssign, Object arg) throws PLPException {
-        System.out.println(statementAssign.ident.getText());
+//        System.out.println(statementAssign.ident.getText());
 //        nestLvl = statementAssign.ident.getNest();
         statementAssign.ident.visit(this, arg);
         statementAssign.expression.visit(this, arg);
@@ -169,9 +169,9 @@ public class TypeInferenceVisitor implements ASTVisitor {
         else{
             throw new TypeCheckException("Assigning wrong type to the variable");
         }
-        System.out.println("result id:"+statementAssign.ident.getDec().getType());
-        System.out.println("result exp:"+statementAssign.expression.getType());
-        System.out.println("----------------");
+//        System.out.println("result id:"+statementAssign.ident.getDec().getType());
+//        System.out.println("result exp:"+statementAssign.expression.getType());
+//        System.out.println("----------------");
         return null;
     }
 
@@ -223,7 +223,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
     public Object visitStatementIf(StatementIf statementIf, Object arg) throws PLPException {
         statementIf.expression.visit(this,arg);
         if(statementIf.expression.getType()!=Types.Type.BOOLEAN && finalPass){
-            System.out.println(statementIf.expression.getType());
+//            System.out.println(statementIf.expression.getType());
             throw new TypeCheckException("expression of IF has no bool type");
         }
         statementIf.statement.visit(this,arg);
@@ -253,7 +253,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
 //            System.out.println("888888888888888");
 //            RnestLvl = (int) expressionBinary.e1.visit(this, arg);
 //        }
-        System.out.println("______________");
+//        System.out.println("______________");
         Expression left = expressionBinary.e0;
         Expression right = expressionBinary.e1;
 
@@ -268,7 +268,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
                 if (((left.getType() == null && right.getType() == null) || (left.getType()!=right.getType())) && finalPass) {
                     throw new TypeCheckException("both types are null to: " + opStr);
                 } else if(left.getType() == null && right.getType() == null && expressionBinary.getType()!=null){
-                    numChanges++; //$$$$$$4444
+                    numChanges++; // ! (a+b)=0 exp.type = number
                     left.setType(expressionBinary.getType());
                     right.setType(expressionBinary.getType());
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING)) {
@@ -426,13 +426,13 @@ public class TypeInferenceVisitor implements ASTVisitor {
             tempType=expressionBinary.getType();
         }
         else if(expressionBinary.getType()!=tempType){
-            System.out.println(expressionBinary.getType());
-            System.out.println(tempType);
+//            System.out.println(expressionBinary.getType());
+//            System.out.println(tempType);
             throw new TypeCheckException("Type of sub expression cannot be compatible to inferred type of expression");
         }
-        System.out.println("Binary:"+String.valueOf(left.firstToken.getText())+":"+left.getType());
-        System.out.println("op:"+opStr);
-        System.out.println("Binary:"+String.valueOf(right.firstToken.getText())+":"+right.getType());
+//        System.out.println("Binary:"+String.valueOf(left.firstToken.getText())+":"+left.getType());
+//        System.out.println("op:"+opStr);
+//        System.out.println("Binary:"+String.valueOf(right.firstToken.getText())+":"+right.getType());
 //        return LnestLvl;
         return null;
     }
@@ -462,7 +462,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
             throw new TypeCheckException("Type of Ident cannot be compatible to inferred type of Ident");
         }
 
-        System.out.println("only for final: "+String.valueOf(expressionIdent.firstToken.getText())+":"+expressionIdent.getType());
+//        System.out.println("only for final: "+String.valueOf(expressionIdent.firstToken.getText())+":"+expressionIdent.getType());
 
 
         return expressionIdent.getNest();
