@@ -183,7 +183,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
         if(typeName!="edu.ufl.cise.plpfa22.ast.ProcDec"){
             throw new TypeCheckException("Call ident is not a procedure");
         }
-            return null;
+        return null;
     }
 
     @Override
@@ -223,7 +223,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
     public Object visitStatementIf(StatementIf statementIf, Object arg) throws PLPException {
         statementIf.expression.visit(this,arg);
         if(statementIf.expression.getType()!=Types.Type.BOOLEAN && finalPass){
-//            System.out.println(statementIf.expression.getType());
+            System.out.println(statementIf.expression.getType());
             throw new TypeCheckException("expression of IF has no bool type");
         }
         statementIf.statement.visit(this,arg);
@@ -268,7 +268,7 @@ public class TypeInferenceVisitor implements ASTVisitor {
                 if (((left.getType() == null && right.getType() == null) || (left.getType()!=right.getType())) && finalPass) {
                     throw new TypeCheckException("both types are null to: " + opStr);
                 } else if(left.getType() == null && right.getType() == null && expressionBinary.getType()!=null){
-                    numChanges++; // ! (a+b)=0 exp.type = number
+                    numChanges++; //$$$$$$4444
                     left.setType(expressionBinary.getType());
                     right.setType(expressionBinary.getType());
                 } else if ((left.getType() != null && right.getType() == null && left.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING) || (left.getType() == null && right.getType() != null && right.getType() != Types.Type.PROCEDURE && right.getType() != Types.Type.STRING)) {
@@ -400,12 +400,12 @@ public class TypeInferenceVisitor implements ASTVisitor {
 //                        varNest.put(Integer.toString(LnestLvl), nestSet);
                     }
                 } else if (left.getType() == right.getType() && left.getType() != null && left.getType() != Types.Type.PROCEDURE) {
-                        tempType = Types.Type.BOOLEAN;
+                    tempType = Types.Type.BOOLEAN;
                 } else if(left.getType()==right.getType() && left.getType()==null){
                     tempType=null;
                 } else {
-                        throw new TypeCheckException("Types are not compatible4");
-                    }
+                    throw new TypeCheckException("Types are not compatible4");
+                }
 
             }
         }

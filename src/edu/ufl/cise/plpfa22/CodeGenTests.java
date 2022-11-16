@@ -47,8 +47,7 @@ public class CodeGenTests {
      * @return
      * @throws Exception
      */
-    Object loadClassAndRunMethod(byte[] bytecode, String className, String
-            methodName, Object[] args) throws Exception {
+    Object loadClassAndRunMethod(byte[] bytecode, String className, String methodName, Object[] args) throws Exception {
         Class<?> testClass = getClass(bytecode, className);
         return runMethod(testClass,methodName, args);
     }
@@ -214,6 +213,7 @@ END
     public void intRelOps(TestInfo testInfo) throws Exception {
         String input = """
 BEGIN
+! 3 = 3;
 ! 3 < 4;
 ! 3 <= 4;
 ! 3 > 4;
@@ -325,14 +325,14 @@ END
 
 
 
-    @DisplayName("stringOut1")
+    @DisplayName("IFstringOut1")
     @Test
     public void stringRelOps1(TestInfo testInfo) throws Exception {
         String input = """
 BEGIN
 ! "FA";
 ! 2;
-IF 1=1 THEN ! 123
+IF 1=2 THEN ! "Howdy"
 END
 .
 """;
@@ -351,8 +351,7 @@ END
     public void stringRelOps2(TestInfo testInfo) throws Exception {
         String input = """
 BEGIN
-! "FA";
-! 2+2
+! "1"+"1"
 END
 .
 """;
