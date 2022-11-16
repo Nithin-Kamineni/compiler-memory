@@ -181,7 +181,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case LT -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPGT, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPGE, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
@@ -192,7 +192,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case LE -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPGE, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPGT, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
@@ -203,7 +203,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case GT -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPLT, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPLE, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
@@ -214,7 +214,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case GE -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPLE, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPLT, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
@@ -235,7 +235,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                 switch (op) {
                     case PLUS -> mv.visitInsn(IADD);
                     case TIMES -> mv.visitInsn(IMUL);
-                    case EQ -> { //l1 1 l2
+                    case EQ -> {
                         Label labelNumEqFalseBr = new Label();
                         mv.visitJumpInsn(IF_ICMPNE, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
@@ -260,7 +260,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case LT -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPGT, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPGE, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
@@ -271,7 +271,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case LE -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPGE, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPGT, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
@@ -282,7 +282,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case GT -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPLT, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPLE, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
@@ -293,7 +293,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case GE -> {
                         Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPLE, labelNumEqFalseBr);
+                        mv.visitJumpInsn(IF_ICMPLT, labelNumEqFalseBr);
                         mv.visitInsn(ICONST_1);
 
                         Label labelPostNumEq = new Label();
