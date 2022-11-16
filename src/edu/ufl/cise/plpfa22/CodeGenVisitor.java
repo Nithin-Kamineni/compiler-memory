@@ -81,72 +81,91 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         //return the bytes making up the classfile
         return classWriter.toByteArray();
     }
-    @Override
-    public Object visitStatementAssign(StatementAssign statementAssign, Object
-            arg) throws PLPException {
-        throw new UnsupportedOperationException();
-    }
-    @Override
-    public Object visitVarDec(VarDec varDec, Object arg) throws PLPException {
-        throw new UnsupportedOperationException();
-    }
-    @Override
-    public Object visitStatementCall(StatementCall statementCall, Object arg)
-            throws PLPException {
-        throw new UnsupportedOperationException();
-    }
-    @Override
-    public Object visitStatementInput(StatementInput statementInput, Object arg)
-            throws PLPException {
-        throw new UnsupportedOperationException();
-    }
-    @Override
-    public Object visitStatementOutput(StatementOutput statementOutput, Object
-            arg) throws PLPException {
-        MethodVisitor mv = (MethodVisitor)arg;
-        mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-        statementOutput.expression.visit(this, arg);
-        Type etype = statementOutput.expression.getType();
-        String JVMType = (etype.equals(Type.NUMBER) ? "I" :
-                (etype.equals(Type.BOOLEAN) ? "Z" : "Ljava/lang/String;"));
-        String printlnSig = "(" + JVMType +")V";
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", printlnSig, false);
-        return null;
-    }
 
-    @Override
-    public Object visitStatementBlock(StatementBlock statementBlock, Object arg)
-            throws PLPException {
-
-        for(int i=0;i<statementBlock.statements.size();i++){
-            statementBlock.statements.get(i).visit(this,arg);
-        }
-        return null;
-    }
-    @Override
-    public Object visitStatementIf(StatementIf statementIf, Object arg) throws PLPException {
-        MethodVisitor mv = (MethodVisitor)arg;
-        statementIf.expression.visit(this, arg);
-
-        Label labelNumEqFalseBr = new Label();
-        mv.visitInsn(ICONST_1);
-        mv.visitJumpInsn(IF_ICMPNE, labelNumEqFalseBr);
-
-        statementIf.statement.visit(this,arg);
-        mv.visitLabel(labelNumEqFalseBr);
-        return null;
-    }
-    @Override
-    public Object visitStatementWhile(StatementWhile statementWhile, Object arg)
-            throws PLPException {
-        throw new UnsupportedOperationException();
-    }
     @Override
     public Object visitExpressionBinary(ExpressionBinary expressionBinary, Object arg) throws PLPException {
         MethodVisitor mv = (MethodVisitor) arg;
         Type argType = expressionBinary.e0.getType();
         Kind op = expressionBinary.op.getKind();
         switch (argType) {
+            case BOOLEAN -> {
+                expressionBinary.e0.visit(this, arg);
+                expressionBinary.e1.visit(this, arg);
+                switch (op) {
+                    case PLUS -> mv.visitInsn(IADD);
+                    case TIMES -> mv.visitInsn(IMUL);
+                    case EQ -> {
+                        Label labelNumEqFalseBr = new Label();
+                        mv.visitJumpInsn(IF_ICMPNE, labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_1);
+
+                        Label labelPostNumEq = new Label();
+                        mv.visitJumpInsn(GOTO, labelPostNumEq);
+
+                        mv.visitLabel(labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(labelPostNumEq);
+                    }
+                    case NEQ -> {
+                        Label labelNumEqFalseBr = new Label();
+                        mv.visitJumpInsn(IF_ICMPEQ, labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_1);
+
+                        Label labelPostNumEq = new Label();
+                        mv.visitJumpInsn(GOTO, labelPostNumEq);
+                        mv.visitLabel(labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(labelPostNumEq);
+                    }
+                    case LT -> {
+                        Label labelNumEqFalseBr = new Label();
+                        mv.visitJumpInsn(IF_ICMPGE, labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_1);
+
+                        Label labelPostNumEq = new Label();
+                        mv.visitJumpInsn(GOTO, labelPostNumEq);
+                        mv.visitLabel(labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(labelPostNumEq);
+                    }
+                    case LE -> {
+                        Label labelNumEqFalseBr = new Label();
+                        mv.visitJumpInsn(IF_ICMPGT, labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_1);
+
+                        Label labelPostNumEq = new Label();
+                        mv.visitJumpInsn(GOTO, labelPostNumEq);
+                        mv.visitLabel(labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(labelPostNumEq);
+                    }
+                    case GT -> {
+                        Label labelNumEqFalseBr = new Label();
+                        mv.visitJumpInsn(IF_ICMPLE, labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_1);
+
+                        Label labelPostNumEq = new Label();
+                        mv.visitJumpInsn(GOTO, labelPostNumEq);
+                        mv.visitLabel(labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(labelPostNumEq);
+                    }
+                    case GE -> {
+                        Label labelNumEqFalseBr = new Label();
+                        mv.visitJumpInsn(IF_ICMPLT, labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_1);
+
+                        Label labelPostNumEq = new Label();
+                        mv.visitJumpInsn(GOTO, labelPostNumEq);
+                        mv.visitLabel(labelNumEqFalseBr);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(labelPostNumEq);
+                    }
+                    default -> {
+                        throw new IllegalStateException("code gen bug in visitExpressionBinary Boolean");
+                    }
+                }
+            }
             case NUMBER -> {
                 expressionBinary.e0.visit(this, arg);
                 expressionBinary.e1.visit(this, arg);
@@ -229,84 +248,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                 }
                 ;
             }
-            case BOOLEAN -> {
-                expressionBinary.e0.visit(this, arg);
-                expressionBinary.e1.visit(this, arg);
-                switch (op) {
-                    case PLUS -> mv.visitInsn(IADD);
-                    case TIMES -> mv.visitInsn(IMUL);
-                    case EQ -> {
-                        Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPNE, labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_1);
-
-                        Label labelPostNumEq = new Label();
-                        mv.visitJumpInsn(GOTO, labelPostNumEq);
-
-                        mv.visitLabel(labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_0);
-                        mv.visitLabel(labelPostNumEq);
-                    }
-                    case NEQ -> {
-                        Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPEQ, labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_1);
-
-                        Label labelPostNumEq = new Label();
-                        mv.visitJumpInsn(GOTO, labelPostNumEq);
-                        mv.visitLabel(labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_0);
-                        mv.visitLabel(labelPostNumEq);
-                    }
-                    case LT -> {
-                        Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPGE, labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_1);
-
-                        Label labelPostNumEq = new Label();
-                        mv.visitJumpInsn(GOTO, labelPostNumEq);
-                        mv.visitLabel(labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_0);
-                        mv.visitLabel(labelPostNumEq);
-                    }
-                    case LE -> {
-                        Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPGT, labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_1);
-
-                        Label labelPostNumEq = new Label();
-                        mv.visitJumpInsn(GOTO, labelPostNumEq);
-                        mv.visitLabel(labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_0);
-                        mv.visitLabel(labelPostNumEq);
-                    }
-                    case GT -> {
-                        Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPLE, labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_1);
-
-                        Label labelPostNumEq = new Label();
-                        mv.visitJumpInsn(GOTO, labelPostNumEq);
-                        mv.visitLabel(labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_0);
-                        mv.visitLabel(labelPostNumEq);
-                    }
-                    case GE -> {
-                        Label labelNumEqFalseBr = new Label();
-                        mv.visitJumpInsn(IF_ICMPLT, labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_1);
-
-                        Label labelPostNumEq = new Label();
-                        mv.visitJumpInsn(GOTO, labelPostNumEq);
-                        mv.visitLabel(labelNumEqFalseBr);
-                        mv.visitInsn(ICONST_0);
-                        mv.visitLabel(labelPostNumEq);
-                    }
-                    default -> {
-                        throw new IllegalStateException("code gen bug in visitExpressionBinary Boolean");
-                    }
-                }
-            }
             case STRING -> {
                 expressionBinary.e0.visit(this, arg);
                 expressionBinary.e1.visit(this, arg);
@@ -319,19 +260,19 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case NEQ -> {
                         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String","equals","("+"Ljava/lang/Object;"+")"+"Z", false);
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/Runtime","not","(Z)Z", false);
+                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","not","(Z)Z", false);
                     }
                     case LT -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/Runtime","lt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","lt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
                     }
                     case LE -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/Runtime","le","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","le","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
                     }
                     case GT -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/Runtime","gt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","gt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
                     }
                     case GE -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/Runtime","ge","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","ge","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
                     }
                     default -> {
                         throw new IllegalStateException("code gen bug in visitExpressionBinary String");
@@ -344,6 +285,68 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         }
         return null;
     }
+
+    @Override
+    public Object visitStatementAssign(StatementAssign statementAssign, Object
+            arg) throws PLPException {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public Object visitVarDec(VarDec varDec, Object arg) throws PLPException {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public Object visitStatementCall(StatementCall statementCall, Object arg)
+            throws PLPException {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public Object visitStatementInput(StatementInput statementInput, Object arg)
+            throws PLPException {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public Object visitStatementOutput(StatementOutput statementOutput, Object
+            arg) throws PLPException {
+        MethodVisitor mv = (MethodVisitor)arg;
+        mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        statementOutput.expression.visit(this, arg);
+        Type etype = statementOutput.expression.getType();
+        String JVMType = (etype.equals(Type.NUMBER) ? "I" :
+                (etype.equals(Type.BOOLEAN) ? "Z" : "Ljava/lang/String;"));
+        String printlnSig = "(" + JVMType +")V";
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", printlnSig, false);
+        return null;
+    }
+
+    @Override
+    public Object visitStatementBlock(StatementBlock statementBlock, Object arg)
+            throws PLPException {
+
+        for(int i=0;i<statementBlock.statements.size();i++){
+            statementBlock.statements.get(i).visit(this,arg);
+        }
+        return null;
+    }
+    @Override
+    public Object visitStatementIf(StatementIf statementIf, Object arg) throws PLPException {
+        MethodVisitor mv = (MethodVisitor)arg;
+        statementIf.expression.visit(this, arg);
+
+        Label labelNumEqFalseBr = new Label();
+        mv.visitInsn(ICONST_1);
+        mv.visitJumpInsn(IF_ICMPNE, labelNumEqFalseBr);
+
+        statementIf.statement.visit(this,arg);
+        mv.visitLabel(labelNumEqFalseBr);
+        return null;
+    }
+    @Override
+    public Object visitStatementWhile(StatementWhile statementWhile, Object arg)
+            throws PLPException {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public Object visitExpressionIdent(ExpressionIdent expressionIdent, Object
             arg) throws PLPException {
