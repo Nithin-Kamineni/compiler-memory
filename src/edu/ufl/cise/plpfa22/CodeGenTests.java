@@ -350,6 +350,27 @@ END
     @Test
     public void stringRelOps2(TestInfo testInfo) throws Exception {
         String input = """
+CONST a="3";
+BEGIN
+! "2"+"1";
+! "1"
+END
+.
+""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        byte[] bytecode = compile(input, shortClassName, JVMpackageName);
+        show(CodeGenUtils.bytecodeToString(bytecode));
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassAndRunMethod(bytecode, className, "main", args);
+    }
+
+
+    @DisplayName("ConstOut1")
+    @Test
+    public void ConstCheck1(TestInfo testInfo) throws Exception {
+        String input = """
 BEGIN
 ! "1"+"1"
 END

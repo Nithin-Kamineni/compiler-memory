@@ -10,8 +10,17 @@ public class stringRuntime {
     int temp=0;
 
     public static boolean ge(String arguments1, String arguments2){
+        //System.out.println("n#####################################################1");
         return arguments1.endsWith(arguments2);}
     public static boolean le(String arguments1, String arguments2){return arguments2.startsWith(arguments1);}
+
+    //suffix
+
+    public static boolean gt(String arguments1, String arguments2){ //>
+        //System.out.println("n#####################################################2");
+        return arguments1.endsWith(arguments2) && !arguments1.equals(arguments2);
+//        return true;
+    }
 
     public static boolean not(boolean arguments) {
         return !arguments;
@@ -43,15 +52,8 @@ public class stringRuntime {
         return arguments1 && !arguments2;
     }
 
-    //suffix
-    public static boolean gt(String arguments1, String arguments2){
-        if(Objects.equals(arguments1, arguments2)){
-            return false;
-        }
-        return arguments1.endsWith(arguments2);}
-
     //prefix
-    public static boolean lt(String arguments1, String arguments2){
+    public static boolean lt(String arguments1, String arguments2){ //<
         if(Objects.equals(arguments1, arguments2)){
             return false;
         }

@@ -17,6 +17,19 @@ public abstract class Declaration extends ASTNode {
 	public Type getType() {
 		return type;
 	}
+
+	public String getDescriptor() {
+		if(type==Type.BOOLEAN){
+			return "Z";
+		}
+		else if(type==Type.NUMBER){
+			return "I";
+		}
+		else{
+			return "Ljava/lang/String;";
+		}
+	}
+
 	public void setType(Type type) {
 		this.type = type;
 	}

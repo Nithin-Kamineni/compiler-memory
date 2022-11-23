@@ -4,7 +4,6 @@
 
 package edu.ufl.cise.plpfa22;
 
-import edu.ufl.cise.plpfa22.ast.ASTNode;
 import edu.ufl.cise.plpfa22.ast.ASTVisitor;
 
 public class CompilerComponentFactory {
@@ -21,7 +20,7 @@ public class CompilerComponentFactory {
 
 	public static ASTVisitor getTypeInferenceVisitor() {return new TypeInferenceVisitor();}
 
-	public static ASTVisitor getCodeGenVisitor(String packageName, String className, String sourceFileName){
-		return new CodeGenVisitor(packageName, className, sourceFileName);
+	public static ASTVisitor getCodeGenVisitor(String className, String packageName, String sourceFileName){
+		return new CodeGenVisitor(className, packageName, sourceFileName);
 	}
 }
