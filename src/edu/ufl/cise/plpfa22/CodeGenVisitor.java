@@ -16,6 +16,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
     final String classDesc;
     Boolean procVisit;
     ClassWriter classWriter;
+
+    //creating the list to return bytecode list
+    List<CodeGenUtils.GenClass> res = new ArrayList<>();
+
     public CodeGenVisitor(String className, String packageName, String
             sourceFileName) {
         super();
@@ -28,21 +32,19 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLPException {
-//create a classWriter and visit it
-        classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-//Hint:  if you get failures in the visitMaxs, try creating a ClassWriter with 0
-// instead of ClassWriter.COMPUTE_FRAMES.  The result will not be a valid classfile,
-// but you will be able to print it so you can see the instructions. After fixing,
-// restore ClassWriter.COMPUTE_FRAMES
-        classWriter.visit(V18, ACC_PUBLIC | ACC_SUPER,
-                fullyQualifiedClassName, null, "java/lang/Object", new String[] {
-                        "java/lang/Runnable" });
 
+        //create a classWriter and visit it
+        classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        //Hint:  if you get failures in the visitMaxs, try creating a ClassWriter with 0
+        // instead of ClassWriter.COMPUTE_FRAMES.  The result will not be a valid classfile,
+        // but you will be able to print it so you can see the instructions. After fixing,
+        // restore ClassWriter.COMPUTE_FRAMES
+        classWriter.visit(V18, ACC_PUBLIC | ACC_SUPER, fullyQualifiedClassName, null, "java/lang/Object", new String[] {"java/lang/Runnable" });
         classWriter.visitSource(className+".java",null);
 
         //simple AST visitor to visit all procedures declarations and annotating them with their JVM names
-        //procVisit = true;
-        //program.block.visit(this, arg);
+        procVisit = true;
+        program.block.visit(this, classWriter);
         procVisit = false;
 
 
@@ -79,8 +81,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         classWriter.visitEnd();
 
 
-        //creating the list to return bytecode list
-        List<CodeGenUtils.GenClass> res = new ArrayList<>();
         res.add(new CodeGenUtils.GenClass(fullyQualifiedClassName, classWriter.toByteArray()));
         //returning byte class
         return res;
@@ -92,25 +92,24 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
     @Override
     public Object visitBlock(Block block, Object arg) throws PLPException {
-        ClassWriter classWriter = (ClassWriter)arg;
-        for (ConstDec constDec : block.constDecs) {
-            constDec.visit(this, null);
-        }
-        for (VarDec varDec : block.varDecs) {
-            varDec.visit(this, classWriter);
-        }
-        for (ProcDec procDec: block.procedureDecs) {
-            procDec.visit(this, null);
-        }
+        if(procVisit) {
+            ClassWriter classWriter = (ClassWriter) arg;
+            for (VarDec varDec : block.varDecs) {
+                varDec.visit(this, classWriter);
+            }
+            for (ProcDec procDec : block.procedureDecs) {
+                procDec.visit(this, classWriter);
+            }
+        } else if(!procVisit){
+            MethodVisitor methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+            methodVisitor.visitCode();
 
-        MethodVisitor methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
-        methodVisitor.visitCode();
-
-//add instructions from statement to method
-        block.statement.visit(this, methodVisitor);
-        methodVisitor.visitInsn(RETURN);
-        methodVisitor.visitMaxs(2,1);
-        methodVisitor.visitEnd();
+            //add instructions from statement to method
+            block.statement.visit(this, methodVisitor);
+            methodVisitor.visitInsn(RETURN);
+            methodVisitor.visitMaxs(2,1);
+            methodVisitor.visitEnd();
+        }
         return null;
     }
 
@@ -146,17 +145,12 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
     @Override
     public Object visitVarDec(VarDec varDec, Object arg) throws PLPException {
-        if(procVisit){
-            throw new UnsupportedOperationException();
-        }
-        else{
             ClassWriter classWriter = (ClassWriter)arg;
             String varName = String.valueOf(varDec.ident.getText());
             String varDescriptor = varDec.getDescriptor();
 
             FieldVisitor fieldVisitor = classWriter.visitField(0, varName, varDescriptor, null, null);
             fieldVisitor.visitEnd();
-        }
         return null;
     }
 
@@ -200,7 +194,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
     @Override
     public Object visitStatementOutput(StatementOutput statementOutput, Object
             arg) throws PLPException {
-        if(!procVisit){
             MethodVisitor mv = (MethodVisitor)arg;
             mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
             statementOutput.expression.visit(this, arg);
@@ -209,7 +202,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     (etype.equals(Type.BOOLEAN) ? "Z" : "Ljava/lang/String;"));
             String printlnSig = "(" + JVMType +")V";
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", printlnSig, false);
-        }
         return null;
     }
 
@@ -431,7 +423,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
     }
     @Override
     public Object visitStatementIf(StatementIf statementIf, Object arg) throws PLPException {
-        if(!procVisit){
             MethodVisitor mv = (MethodVisitor)arg;
             statementIf.expression.visit(this, arg);
 
@@ -441,7 +432,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
             statementIf.statement.visit(this,arg);
             mv.visitLabel(labelNumEqFalseBr);
-        }
         return null;
     }
     @Override
@@ -463,44 +453,84 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
     @Override
     public Object visitExpressionNumLit(ExpressionNumLit expressionNumLit, Object arg) throws PLPException {
-        if(!procVisit){
             MethodVisitor mv = (MethodVisitor)arg;
             mv.visitLdcInsn(expressionNumLit.getFirstToken().getIntValue());
-        }
         return null;
     }
     @Override
     public Object visitExpressionStringLit(ExpressionStringLit expressionStringLit, Object arg) throws PLPException {
-        if(!procVisit){
             MethodVisitor mv = (MethodVisitor)arg;
             mv.visitLdcInsn(expressionStringLit.getFirstToken().getStringValue());
-        }
         return null;
     }
     @Override
     public Object visitExpressionBooleanLit(ExpressionBooleanLit expressionBooleanLit, Object arg) throws PLPException {
-        if(!procVisit){
             MethodVisitor mv = (MethodVisitor)arg;
             mv.visitLdcInsn(expressionBooleanLit.getFirstToken().getBooleanValue());
-        }
         return null;
     }
     @Override
     public Object visitProcedure(ProcDec procDec, Object arg) throws PLPException
     {
-        MethodVisitor mv = (MethodVisitor)arg;
+        ClassWriter classWriter = (ClassWriter)arg;
         if(procVisit){
-            mv = classWriter.visitMethod(ACC_PUBLIC + ACC_STATIC, String.valueOf(procDec.ident.getText()), "()V", null, null);
+            //System.out.println(fullyQualifiedClassName+"$"+String.valueOf(procDec.ident.getText()));
+//            classWriter.visit(V18, ACC_SUPER, fullyQualifiedClassName+"$"+String.valueOf(procDec.ident.getText()), null, "java/lang/Object", new String[] {"java/lang/Runnable" });
+            classWriter.visitNestMember(fullyQualifiedClassName+"$"+String.valueOf(procDec.ident.getText()));
         }
         else{
-            throw new UnsupportedOperationException();
+            classWriter.visit(V18, ACC_SUPER, fullyQualifiedClassName+"$"+String.valueOf(procDec.ident.getText()), null, "java/lang/Object", new String[] {"java/lang/Runnable" });
+//            classWriter.visitInnerClass(fullyQualifiedClassName+"$"+String.valueOf(procDec.ident.getText()), fullyQualifiedClassName, String.valueOf(procDec.ident.getText()), 0);
+//            procDec.block.visit(this, arg);
+//            MethodVisitor methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+//            methodVisitor.visitCode();
+
+            MethodVisitor methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+            methodVisitor.visitCode();
+            procDec.block.statement.visit(this, classWriter);
+            methodVisitor.visitInsn(RETURN);
+            methodVisitor.visitMaxs(2, 1);
+            methodVisitor.visitEnd();
+
+
+//            methodVisitor = classWriter.visitMethod(0, "<init>", "(Ledu/ufl/cise/plpfa22/codeGenSamples/Var2;)V", null, null);
+            methodVisitor = classWriter.visitMethod(0, "<init>", "(L"+fullyQualifiedClassName+";)V", null, null);
+            methodVisitor.visitCode();
+            methodVisitor.visitVarInsn(ALOAD, 0);
+            methodVisitor.visitVarInsn(ALOAD, 1);
+//            methodVisitor.visitFieldInsn(PUTFIELD, "edu/ufl/cise/plpfa22/codeGenSamples/Var2$p", "this$0", "Ledu/ufl/cise/plpfa22/codeGenSamples/Var2;");
+            methodVisitor.visitFieldInsn(PUTFIELD, fullyQualifiedClassName+"$"+String.valueOf(procDec.ident.getText()), "this$0", "L"+fullyQualifiedClassName+";");
+            methodVisitor.visitVarInsn(ALOAD, 0);
+            methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+            methodVisitor.visitInsn(RETURN);
+            methodVisitor.visitMaxs(2, 2);
+            methodVisitor.visitEnd();
+
+            classWriter.visitEnd();
+
+            res.add(new CodeGenUtils.GenClass(fullyQualifiedClassName+"$"+String.valueOf(procDec.ident.getText()), classWriter.toByteArray()));
         }
         return null;
     }
 
     @Override
     public Object visitStatementCall(StatementCall statementCall, Object arg) throws PLPException {
-        throw new UnsupportedOperationException();
+        MethodVisitor methodVisitor = (MethodVisitor)arg;
+//        methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+        methodVisitor.visitCode();
+
+        System.out.println("came to the procedure1");
+        methodVisitor.visitTypeInsn(NEW, fullyQualifiedClassName+"$"+String.valueOf(statementCall.ident.getText()));
+        methodVisitor.visitInsn(DUP);
+        methodVisitor.visitVarInsn(ALOAD, 0);
+        methodVisitor.visitMethodInsn(INVOKESPECIAL, fullyQualifiedClassName+"$"+String.valueOf(statementCall.ident.getText()), "<init>", "(L"+fullyQualifiedClassName+";)V", false);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, fullyQualifiedClassName+"$"+String.valueOf(statementCall.ident.getText()), "run", "()V", false);
+
+        methodVisitor.visitInsn(RETURN);
+
+        methodVisitor.visitMaxs(3, 1);
+        methodVisitor.visitEnd();
+        return null;
     }
 
     @Override

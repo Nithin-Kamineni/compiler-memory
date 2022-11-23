@@ -464,7 +464,7 @@ public class CodeGenTests4 {
 				!b;
 				!c
 				END;
-				CALL p
+				//CALL p
 				.  
 				""";
         String shortClassName = "prog";
@@ -633,6 +633,33 @@ public class CodeGenTests4 {
         loadClassesAndRunMain(classes, className);
     }
 
+    @DisplayName("While1")
+    @Test
+    public void while1(TestInfo testInfo) throws Exception{
+        String input = """
+				CONST a = 5;
+				VAR x,y,st;
+				BEGIN
+				x := a;
+				y := 0;
+				st := "loop";
+				WHILE y<x
+				    DO
+				        BEGIN
+				        y := y+1;
+				        ! st;
+				        ! y
+				        END
+				END
+				.
+				""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        List<GenClass> classes = compile(input, shortClassName, JVMpackageName);
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassesAndRunMain(classes, className);
+    }
 
 
 }
