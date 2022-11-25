@@ -464,8 +464,8 @@ public class CodeGenTests4 {
 				!b;
 				!c
 				END;
-				//CALL p
-				.  
+				CALL p
+				.
 				""";
         String shortClassName = "prog";
         String JVMpackageName = "edu/ufl/cise/plpfa22";
@@ -661,6 +661,23 @@ public class CodeGenTests4 {
         loadClassesAndRunMain(classes, className);
     }
 
+    @DisplayName("proc3")
+    @Test
+    public void proc3(TestInfo testInfo) throws Exception{
+        String input = """
+				PROCEDURE p1;
+				! 1
+				;
+				CALL p1
+				.
+				""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        List<GenClass> classes = compile(input, shortClassName, JVMpackageName);
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassesAndRunMain(classes, className);
+    }
 
 }
 

@@ -1,15 +1,15 @@
 package edu.ufl.cise.plpfa22;
 import edu.ufl.cise.plpfa22.ast.*;
 
-import javax.swing.*;
-import java.util.*;
-import java.io.*;
+import java.util.List;
+import java.util.UUID;
 
 public class ScopeVisitor implements ASTVisitor {
 
     symbolTable ST = new symbolTable();
     int PassNumber =0;
     String scopeId = UUID.randomUUID().toString();
+    String prevpath = "";
 
     @Override
     public Object visitProgram(Program program, Object arg) throws PLPException {
@@ -53,6 +53,7 @@ public class ScopeVisitor implements ASTVisitor {
     public Object visitVarDec(VarDec varDec, Object arg) throws PLPException {
         if(PassNumber==1) {
             String name = String.valueOf(varDec.ident.getText());
+
             varDec.setNest(ST.currentScope);  //setting nest level
             ST.addDec(name, varDec);
         }
@@ -63,6 +64,10 @@ public class ScopeVisitor implements ASTVisitor {
     public Object visitProcedure(ProcDec procDec, Object arg) throws PLPException {
         if(PassNumber==0) {
             String name = String.valueOf(procDec.ident.getText());
+
+            procDec.setProcpath(prevpath+"$"+name);
+
+            prevpath = procDec.getProcpath();
             ST.addDec(name, procDec);
          // 5, 6, param 16
             procDec.setNest(ST.currentScope);              //setting nest level
@@ -111,6 +116,7 @@ public class ScopeVisitor implements ASTVisitor {
         if(PassNumber==1) {
             String varStatname = String.valueOf(statementInput.ident.getText());
             Declaration tempDec = ST.lookup(varStatname);
+
             //type check
             if (tempDec == null) {
                 throw new ScopeException("ID is not declared in this scope or previous nested scopes");
