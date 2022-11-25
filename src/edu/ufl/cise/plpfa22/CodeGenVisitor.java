@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+//problem with procedure init method
+
 public class CodeGenVisitor implements ASTVisitor, Opcodes {
     final String packageName;
     final String className;
@@ -55,8 +57,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         program.block.visit(this, classWriter);
         procVisit = false;
 
-
-        //visit the block, passing it the methodVisitor ??
 
         //creating methodVisitor object
         MethodVisitor methodVisitor;
@@ -182,16 +182,17 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         }
         else{
             ClassWriter classWriter1 = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-            classWriter1.visit(V18, ACC_PUBLIC | ACC_SUPER, fullyQualifiedClassName+procDec.getProcpath(), null, "java/lang/Object", new String[] {"java/lang/Runnable"});
+
+            System.out.println(fullyQualifiedClassName+procDec.getProcpath());
+
+            classWriter1.visit(V18, ACC_SUPER, fullyQualifiedClassName+procDec.getProcpath(), null, "java/lang/Object", new String[] {"java/lang/Runnable"});
             classWriter1.visitSource(className+".java",null);
 
             classWriter1.visitNestHost(fullyQualifiedClassName);
 
             classWriter1.visitInnerClass(fullyQualifiedClassName+procDec.getProcpath(), fullyQualifiedClassName, String.valueOf(procDec.ident.getText()), 0);
 
-            System.out.println(procDec.getProcpath()+"*******************************************************************************");
-
-            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$0", "L"+className+";", null, null);
+            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$"+procDec.getNest(), "L"+className+";", null, null);
             fieldVisitor.visitEnd();
 //
             //create init method for synthetic class
@@ -199,7 +200,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             methodVisitor.visitCode();
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitVarInsn(ALOAD, 1);
-            methodVisitor.visitFieldInsn(PUTFIELD, fullyQualifiedClassName+procDec.getProcpath(), "this$0", "L"+fullyQualifiedClassName+";");
+            methodVisitor.visitFieldInsn(PUTFIELD, fullyQualifiedClassName+procDec.getProcpath(), "this$"+procDec.getNest(), "L"+fullyQualifiedClassName+";");
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
             methodVisitor.visitInsn(RETURN);
@@ -209,9 +210,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             //visiting block to declare variables of procedure and create run method for synthetic class
             procPathFunc = procDec.getProcpath();
             procDec.block.visit(this, classWriter1);
-            methodVisitor.visitInsn(RETURN);
-            methodVisitor.visitMaxs(2, 1);
-            methodVisitor.visitEnd();
 
             classWriter1.visitEnd();
             res.add(new CodeGenUtils.GenClass(fullyQualifiedClassName+procDec.getProcpath(), classWriter1.toByteArray()));
@@ -545,11 +543,12 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
     public Object visitStatementCall(StatementCall statementCall, Object arg) throws PLPException {
         MethodVisitor methodVisitor = (MethodVisitor)arg;
 
-        methodVisitor.visitTypeInsn(NEW, fullyQualifiedClassName+"$"+String.valueOf(statementCall.ident.getText()));
+        methodVisitor.visitTypeInsn(NEW, fullyQualifiedClassName+"$p1");
         methodVisitor.visitInsn(DUP);
+
         methodVisitor.visitVarInsn(ALOAD, 0);
-        methodVisitor.visitMethodInsn(INVOKESPECIAL, fullyQualifiedClassName+"$"+String.valueOf(statementCall.ident.getText()), "<init>", "(L"+fullyQualifiedClassName+";)V", false);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, fullyQualifiedClassName+"$"+String.valueOf(statementCall.ident.getText()), "run", "()V", false);
+        methodVisitor.visitMethodInsn(INVOKESPECIAL, fullyQualifiedClassName+"$p1", "<init>", "(L"+fullyQualifiedClassName+";)V", false);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, fullyQualifiedClassName+"$p1", "run", "()V", false);
 
         return null;
     }

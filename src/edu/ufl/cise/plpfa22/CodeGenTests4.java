@@ -666,7 +666,7 @@ public class CodeGenTests4 {
     public void proc3(TestInfo testInfo) throws Exception{
         String input = """
 				PROCEDURE p1;
-				! 1
+				//! 1
 				;
 				CALL p1
 				.
