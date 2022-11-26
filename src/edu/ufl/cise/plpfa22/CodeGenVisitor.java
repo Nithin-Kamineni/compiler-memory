@@ -20,6 +20,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
     String procPathFunc="";
     Boolean procVisit;
     ClassWriter classWriter;
+    int procNest;
 
     //creating the list to return bytecode list
     List<CodeGenUtils.GenClass> res = new ArrayList<>();
@@ -119,13 +120,13 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                 procDec.visit(this, null);
             }
 
-            MethodVisitor methodVisitor = classWriter1.visitMethod(ACC_PUBLIC, "run", "()V", null, null);
+            MethodVisitor methodVisitor = classWriter1.visitMethod(0, "run", "()V", null, null);
             methodVisitor.visitCode();
 
             //add instructions from statement to method
             block.statement.visit(this, methodVisitor);
             methodVisitor.visitInsn(RETURN);
-            methodVisitor.visitMaxs(2,1);
+            methodVisitor.visitMaxs(3,1);
             methodVisitor.visitEnd();
         }
         return null;
@@ -167,7 +168,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             String varName = String.valueOf(varDec.ident.getText());
             String varDescriptor = varDec.getDescriptor();
 
-            FieldVisitor fieldVisitor = classWriter1.visitField(0, varName, varDescriptor, null, null);
+            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_PUBLIC, varName, varDescriptor, null, null);
             fieldVisitor.visitEnd();
         return null;
     }
@@ -178,7 +179,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         if(procVisit){
             ClassWriter classWriter1 = (ClassWriter)arg;
             classWriter1.visitNestMember(fullyQualifiedClassName+procDec.getProcpath());
-            classWriter1.visitInnerClass(fullyQualifiedClassName+procDec.getProcpath(), fullyQualifiedClassName, String.valueOf(procDec.ident.getText()), 0);
+//            classWriter1.visitInnerClass(fullyQualifiedClassName+procDec.getProcpath(), fullyQualifiedClassName, String.valueOf(procDec.ident.getText()), 0);
         }
         else{
             ClassWriter classWriter1 = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -190,26 +191,36 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
             classWriter1.visitNestHost(fullyQualifiedClassName);
 
-            classWriter1.visitInnerClass(fullyQualifiedClassName+procDec.getProcpath(), fullyQualifiedClassName, String.valueOf(procDec.ident.getText()), 0);
+            //classWriter1.visitInnerClass(fullyQualifiedClassName+procDec.getProcpath(), fullyQualifiedClassName, String.valueOf(procDec.ident.getText()), 0);
 
-            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$"+procDec.getNest(), "L"+className+";", null, null);
+            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$"+procDec.getNest(), "L"+fullyQualifiedClassName+";", null, null);
             fieldVisitor.visitEnd();
 //
             //create init method for synthetic class
             MethodVisitor methodVisitor = classWriter1.visitMethod(0, "<init>", "(L"+fullyQualifiedClassName+";)V", null, null);
             methodVisitor.visitCode();
+
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitVarInsn(ALOAD, 1);
+
             methodVisitor.visitFieldInsn(PUTFIELD, fullyQualifiedClassName+procDec.getProcpath(), "this$"+procDec.getNest(), "L"+fullyQualifiedClassName+";");
+
             methodVisitor.visitVarInsn(ALOAD, 0);
+
+
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
             methodVisitor.visitInsn(RETURN);
             methodVisitor.visitMaxs(2, 2);
             methodVisitor.visitEnd();
 
+            //getting nest level of procedure
+            procNest = procDec.getNest();
+            System.out.println("Procedure Nest:"+procNest);
+
             //visiting block to declare variables of procedure and create run method for synthetic class
             procPathFunc = procDec.getProcpath();
             procDec.block.visit(this, classWriter1);
+            procPathFunc = "";
 
             classWriter1.visitEnd();
             res.add(new CodeGenUtils.GenClass(fullyQualifiedClassName+procDec.getProcpath(), classWriter1.toByteArray()));
@@ -229,19 +240,19 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 //        System.out.println("came here to expression Ident");
         MethodVisitor mv = (MethodVisitor)arg;
         if(expressionIdent.getDec() instanceof ConstDec){
-//            System.out.println("This is const variable");
-//            System.out.println(String.valueOf(expressionIdent.firstToken.getText())+":"+((ConstDec) expressionIdent.getDec()).val);
             mv.visitLdcInsn(((ConstDec) expressionIdent.getDec()).val);
         } else {
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitFieldInsn(GETFIELD,fullyQualifiedClassName, String.valueOf(expressionIdent.firstToken.getText()), expressionIdent.getDec().getDescriptor());
 
+            int nestLevel = expressionIdent.getDec().getNest();
+            System.out.println("Varnest:"+nestLevel);
 
+            for(int presentNest=procNest+1;presentNest>nestLevel;presentNest--){
+//            System.out.println("present:"+presentNest);
+                mv.visitFieldInsn(GETFIELD, fullyQualifiedClassName+procPathFunc, "this$"+(presentNest-1), "L"+fullyQualifiedClassName+";");
+            }
 
-//            mv.visitVarInsn(ALOAD, 0);
-//            mv.visitFieldInsn(GETFIELD, "edu/ufl/cise/plpfa22/codeGenSamples/Var2$p", "this$0", "Ledu/ufl/cise/plpfa22/codeGenSamples/Var2;");
-//            mv.visitFieldInsn(GETFIELD,fullyQualifiedClassName+procPathFunc, "this$0", "L"+fullyQualifiedClassName+";");
-//            mv.visitFieldInsn(GETFIELD,fullyQualifiedClassName, String.valueOf(expressionIdent.firstToken.getText()), expressionIdent.getDec().getDescriptor());
+            mv.visitFieldInsn(GETFIELD,fullyQualifiedClassName+procPathFunc, String.valueOf(expressionIdent.firstToken.getText()), expressionIdent.getDec().getDescriptor());
         }
         return null;
     }
@@ -251,8 +262,17 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         MethodVisitor mv = (MethodVisitor)arg;
         //go up the nest level ?
         mv.visitVarInsn(ALOAD, 0);
+        int nestLevel = ident.getDec().getNest();
+        System.out.println("Varnest:"+nestLevel);
+
+        for(int presentNest=procNest+1;presentNest>nestLevel;presentNest--){
+//            System.out.println("present:"+presentNest);
+            mv.visitFieldInsn(GETFIELD, fullyQualifiedClassName+procPathFunc, "this$"+(presentNest-1), "L"+fullyQualifiedClassName+";");
+        }
+        //mv.visitFieldInsn(GETFIELD, fullyQualifiedClassName+procPathFunc, "this$0", "L"+fullyQualifiedClassName+";");
+
         mv.visitInsn(SWAP);
-        mv.visitFieldInsn(PUTFIELD,fullyQualifiedClassName, String.valueOf(ident.firstToken.getText()), ident.getDec().getDescriptor());
+        mv.visitFieldInsn(PUTFIELD,fullyQualifiedClassName+procPathFunc, String.valueOf(ident.firstToken.getText()), ident.getDec().getDescriptor());
         return null;
     }
 

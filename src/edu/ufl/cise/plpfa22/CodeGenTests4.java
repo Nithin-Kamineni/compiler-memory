@@ -665,8 +665,16 @@ public class CodeGenTests4 {
     @Test
     public void proc3(TestInfo testInfo) throws Exception{
         String input = """
+                VAR a,b,c;
 				PROCEDURE p1;
-				//! 1
+				BEGIN
+				a := 1;
+				b:= "he";
+				c := FALSE;
+				! a;
+				! b;
+				! c
+				END
 				;
 				CALL p1
 				.
@@ -679,5 +687,40 @@ public class CodeGenTests4 {
         loadClassesAndRunMain(classes, className);
     }
 
+    @DisplayName("proc4nestTest")
+    @Test
+    public void proc4(TestInfo testInfo) throws Exception{
+        String input = """
+                 VAR a;
+				PROCEDURE p1;
+				    //VAR a;
+				    a := 1
+				;
+				CALL p1
+				.
+				""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        List<GenClass> classes = compile(input, shortClassName, JVMpackageName);
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassesAndRunMain(classes, className);
+    }
+
+    @DisplayName("var4Test")
+    @Test
+    public void var4(TestInfo testInfo) throws Exception{
+        String input = """
+                VAR a;
+				a := 1
+				.
+				""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        List<GenClass> classes = compile(input, shortClassName, JVMpackageName);
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassesAndRunMain(classes, className);
+    }
 }
 
