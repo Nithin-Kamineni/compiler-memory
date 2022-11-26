@@ -168,7 +168,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             String varName = String.valueOf(varDec.ident.getText());
             String varDescriptor = varDec.getDescriptor();
 
-            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_PUBLIC, varName, varDescriptor, null, null);
+            FieldVisitor fieldVisitor = classWriter1.visitField(0, varName, varDescriptor, null, null);
             fieldVisitor.visitEnd();
         return null;
     }
@@ -252,7 +252,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                 mv.visitFieldInsn(GETFIELD, fullyQualifiedClassName+procPathFunc, "this$"+(presentNest-1), "L"+fullyQualifiedClassName+";");
             }
 
-            mv.visitFieldInsn(GETFIELD,fullyQualifiedClassName+procPathFunc, String.valueOf(expressionIdent.firstToken.getText()), expressionIdent.getDec().getDescriptor());
+//            mv.visitFieldInsn(GETFIELD,fullyQualifiedClassName+procPathFunc, String.valueOf(expressionIdent.firstToken.getText()), expressionIdent.getDec().getDescriptor());
+
+            mv.visitFieldInsn(GETFIELD,fullyQualifiedClassName, String.valueOf(expressionIdent.firstToken.getText()), expressionIdent.getDec().getDescriptor());
         }
         return null;
     }
@@ -272,7 +274,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         //mv.visitFieldInsn(GETFIELD, fullyQualifiedClassName+procPathFunc, "this$0", "L"+fullyQualifiedClassName+";");
 
         mv.visitInsn(SWAP);
-        mv.visitFieldInsn(PUTFIELD,fullyQualifiedClassName+procPathFunc, String.valueOf(ident.firstToken.getText()), ident.getDec().getDescriptor());
+//        mv.visitFieldInsn(PUTFIELD,fullyQualifiedClassName+procPathFunc, String.valueOf(ident.firstToken.getText()), ident.getDec().getDescriptor());
+        mv.visitFieldInsn(PUTFIELD,fullyQualifiedClassName, String.valueOf(ident.firstToken.getText()), ident.getDec().getDescriptor());
         return null;
     }
 
