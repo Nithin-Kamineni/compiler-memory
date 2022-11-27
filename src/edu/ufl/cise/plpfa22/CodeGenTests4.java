@@ -693,8 +693,29 @@ public class CodeGenTests4 {
         String input = """
                  VAR a;
 				PROCEDURE p1;
-				    //VAR a;
-				    a := 1
+				a := 1
+				;
+				CALL p1
+				.
+				""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        List<GenClass> classes = compile(input, shortClassName, JVMpackageName);
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassesAndRunMain(classes, className);
+    }
+
+    @DisplayName("proc4DoubleNestTest")
+    @Test
+    public void proc5(TestInfo testInfo) throws Exception{
+        String input = """
+                VAR a;
+				PROCEDURE p1;
+				   PROCEDURE p2;
+				   a := 1
+				   ;
+		           CALL p2
 				;
 				CALL p1
 				.

@@ -34,8 +34,13 @@ public abstract class Declaration extends ASTNode {
 		this.type = type;
 	}
 
+
+
 	int nest;
 	public int getNest(){return nest;}
 	public void setNest(int nest) { this.nest = nest; }
 
+	public String procpath;
+	public String  getProcpath(){return procpath;}
+	public void setProcpath(String procpath) { this.procpath = procpath; }
 }

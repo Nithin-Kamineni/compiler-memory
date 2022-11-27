@@ -11,7 +11,6 @@ public class ProcDec extends Declaration {
 
 	public final IToken ident;
 	public final Block block;
-	public String procpath;
 
 	public ProcDec(IToken firstToken, IToken name, Block body) {
 		super(firstToken);
@@ -28,9 +27,6 @@ public class ProcDec extends Declaration {
 	public String toString() {
 		return "ProcDec [" + (ident != null ? "ident=" + ident + ", " : "") + (block != null ? "block=" + block : "") + "]";
 	}
-
-	public String  getProcpath(){return procpath;}
-	public void setProcpath(String procpath) { this.procpath = procpath; }
 	
 	
 
