@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 public class BytecodeTests {
 
     public static void main(String[] args) throws IOException {
-        new ClassReader(BytecodeTests.class.getResourceAsStream("var3$p1.class")).accept(new TraceClassVisitor(null, new ASMifier(), new PrintWriter(System.out)), 0);
+        new ClassReader(BytecodeTests.class.getResourceAsStream("proc2$p$q.class")).accept(new TraceClassVisitor(null, new ASMifier(), new PrintWriter(System.out)), 0);
     }
 
 }

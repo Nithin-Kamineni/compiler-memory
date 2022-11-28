@@ -514,8 +514,8 @@ public class CodeGenTests4 {
 							! "in q, calling q1";
 							//! "debug run, no CALL q1";
 							CALL q1;
-							END;  
-							//end of q				
+							END;
+							//end of q			
 					BEGIN 
 					  ! "in p";
 					  IF a > 0 THEN BEGIN ! "calling q"; CALL q END
@@ -602,7 +602,7 @@ public class CodeGenTests4 {
 				a := 6;
 				CALL p
 				END
-				.  
+				.
 				""";
         String shortClassName = "prog";
         String JVMpackageName = "edu/ufl/cise/plpfa22";
@@ -713,7 +713,10 @@ public class CodeGenTests4 {
                 VAR a;
 				PROCEDURE p1;
 				   PROCEDURE p2;
-				   a := 1
+				   BEGIN
+				   a := 1;
+				   ! a
+				   END
 				   ;
 		           CALL p2
 				;
@@ -735,6 +738,78 @@ public class CodeGenTests4 {
                 VAR a;
 				a := 1
 				.
+				""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        List<GenClass> classes = compile(input, shortClassName, JVMpackageName);
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassesAndRunMain(classes, className);
+    }
+
+    @DisplayName("proc6")
+    @Test
+    public void proc6(TestInfo testInfo) throws Exception{
+        String input = """
+				VAR a;
+					PROCEDURE p;
+						PROCEDURE q;
+							BEGIN
+							a := 1;
+							! "in q"
+							END
+                        ;
+					BEGIN
+					  ! "in p";
+					  IF a > 0 THEN BEGIN ! "calling q"; CALL q END
+					END;
+				BEGIN  //main
+				   a := 1;
+				   ! "in main calling p, a=1";
+				   CALL p ;
+				   ! "terminating back in main"
+				END
+				.  
+				""";
+        String shortClassName = "prog";
+        String JVMpackageName = "edu/ufl/cise/plpfa22";
+        List<GenClass> classes = compile(input, shortClassName, JVMpackageName);
+        Object[] args = new Object[1];
+        String className = "edu.ufl.cise.plpfa22.prog";
+        loadClassesAndRunMain(classes, className);
+    }
+
+
+    @DisplayName("tempproc2")
+    @Test
+    public void tempproc2(TestInfo testInfo) throws Exception{
+        String input = """
+				VAR a;
+					PROCEDURE p;
+						PROCEDURE q;
+							BEGIN
+							! "in q, calling q1";
+							//! "debug run, no CALL q1";
+							CALL q1;
+							END;
+					BEGIN
+					  ! "in p";
+					  IF a > 0 THEN BEGIN ! "calling q"; CALL q END
+					END;	  
+					//end of p
+					PROCEDURE q1;
+					BEGIN 
+					    ! "in q1 calling r"
+					    //CALL r;
+					END;
+					// end of q1
+				BEGIN  //main
+				   a := 1;
+				   ! "in main calling p, a=1";
+				   CALL p ;
+				   ! "terminating back in main"
+				END
+				.  
 				""";
         String shortClassName = "prog";
         String JVMpackageName = "edu/ufl/cise/plpfa22";

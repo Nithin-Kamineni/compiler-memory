@@ -8,6 +8,7 @@ import org.objectweb.asm.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 //problem with procedure init method
 
@@ -176,6 +177,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
     @Override
     public Object visitProcedure(ProcDec procDec, Object arg) throws PLPException
     {
+        procPathFunc = fullyQualifiedClassName+procDec.getProcpath();
         if(procVisit){
             ClassWriter classWriter1 = (ClassWriter)arg;
             classWriter1.visitNestMember(fullyQualifiedClassName+procDec.getProcpath());
@@ -203,19 +205,19 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             classWriter1.visitNestHost(fullyQualifiedClassName);
 
             //change the dollar signs to their supper class using path
-            classWriter1.visitInnerClass(fullyQualifiedClassName+procDec.getProcpath(), fullyQualifiedClassName, String.valueOf(procDec.ident.getText()), 0);
+            classWriter1.visitInnerClass(fullyQualifiedClassName+procDec.getProcpath(), parentClassName, String.valueOf(procDec.ident.getText()), 0);
 
-            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$"+procDec.getNest(), "L"+fullyQualifiedClassName+";", null, null);
+            FieldVisitor fieldVisitor = classWriter1.visitField(ACC_FINAL | ACC_SYNTHETIC, "this$"+procDec.getNest(), "L"+parentClassName+";", null, null);
             fieldVisitor.visitEnd();
 
             //create init method for synthetic class
-            MethodVisitor methodVisitor = classWriter1.visitMethod(0, "<init>", "(L"+fullyQualifiedClassName+";)V", null, null);
+            MethodVisitor methodVisitor = classWriter1.visitMethod(0, "<init>", "(L"+parentClassName+";)V", null, null);
             methodVisitor.visitCode();
 
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitVarInsn(ALOAD, 1);
 
-            methodVisitor.visitFieldInsn(PUTFIELD, fullyQualifiedClassName+procDec.getProcpath(), "this$"+procDec.getNest(), "L"+fullyQualifiedClassName+";");
+            methodVisitor.visitFieldInsn(PUTFIELD, fullyQualifiedClassName+procDec.getProcpath(), "this$"+procDec.getNest(), "L"+parentClassName+";");
 
             methodVisitor.visitVarInsn(ALOAD, 0);
 
@@ -232,7 +234,12 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             //visiting block to declare variables of procedure and create run method for synthetic class
             procPathFunc = fullyQualifiedClassName+procDec.getProcpath();
             procDec.block.visit(this, classWriter1);
-            procPathFunc = fullyQualifiedClassName;
+            for(int i=procPathFunc.length()-1;i>=0;i--){
+                if(procPathFunc.charAt(i)=='$'){
+                    procPathFunc =  procPathFunc.substring(0,i);
+                    break;
+                }
+            }
 
             classWriter1.visitEnd();
             res.add(new CodeGenUtils.GenClass(fullyQualifiedClassName+procDec.getProcpath(), classWriter1.toByteArray()));
@@ -256,12 +263,18 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         } else {
             mv.visitVarInsn(ALOAD, 0);
 
-            int nestLevel = expressionIdent.getDec().getNest();
+            int decnestLevel = expressionIdent.getDec().getNest();
 
             String superClassPath=procPathFunc;
-            String subClassPath;
 
-            for(int presentNest=procNest+1;presentNest>nestLevel;presentNest--){
+            String subClassPath;
+            int presnestvar = expressionIdent.getNest();
+
+            System.out.println("var dec nest 2:"+decnestLevel);
+            System.out.println("var present nest 2:"+presnestvar);
+
+            System.out.println("This type:"+procPathFunc);
+            for(int presentNest=presnestvar;presentNest>decnestLevel;presentNest--){
 //            System.out.println("present:"+presentNest);
                 subClassPath = superClassPath;
                 for(int i=subClassPath.length()-1;i>=0;i--){
@@ -285,12 +298,15 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
         MethodVisitor mv = (MethodVisitor)arg;
         //go up the nest level ?
         mv.visitVarInsn(ALOAD, 0);
-        int nestLevel = ident.getDec().getNest();
+        int decnestLevel = ident.getDec().getNest();
+        int presnestvar = ident.getNest();
+        System.out.println("var dec nest:"+decnestLevel);
+        System.out.println("var present nest:"+presnestvar);
 
         String superClassPath=procPathFunc;
         String subClassPath;
 
-        for(int presentNest=procNest+1;presentNest>nestLevel;presentNest--){
+        for(int presentNest=presnestvar;presentNest>decnestLevel;presentNest--){
 //            System.out.println("present:"+presentNest);
             subClassPath = superClassPath;
             for(int i=subClassPath.length()-1;i>=0;i--){
@@ -596,13 +612,50 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
     public Object visitStatementCall(StatementCall statementCall, Object arg) throws PLPException {
         MethodVisitor methodVisitor = (MethodVisitor)arg;
 
-        System.out.println(statementCall.ident.getDec().getProcpath());
-        methodVisitor.visitTypeInsn(NEW, fullyQualifiedClassName+statementCall.ident.getDec().getProcpath());
-        methodVisitor.visitInsn(DUP);
+        System.out.println("14 call ident"+String.valueOf(statementCall.ident.firstToken.getText()));
+        System.out.println(procPathFunc);
+        System.out.println("14 ident nest: "+statementCall.ident.getNest());
+        System.out.println("14 ident decl nest: "+statementCall.ident.getDec().getNest());
 
-        methodVisitor.visitVarInsn(ALOAD, 0);
-        methodVisitor.visitMethodInsn(INVOKESPECIAL, fullyQualifiedClassName+statementCall.ident.getDec().getProcpath(), "<init>", "(L"+fullyQualifiedClassName+";)V", false);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, fullyQualifiedClassName+statementCall.ident.getDec().getProcpath(), "run", "()V", false);
+        if(Objects.equals(procPathFunc, fullyQualifiedClassName + statementCall.ident.getDec().getProcpath())){
+//            System.out.println("calling in same function, recurtion");
+            methodVisitor.visitVarInsn(ALOAD, 0);
+            methodVisitor.visitMethodInsn(INVOKEVIRTUAL, fullyQualifiedClassName+statementCall.ident.getDec().getProcpath(), "run", "()V", false);
+        }
+        else{
+            methodVisitor.visitTypeInsn(NEW, fullyQualifiedClassName+statementCall.ident.getDec().getProcpath());
+            methodVisitor.visitInsn(DUP);
+
+            methodVisitor.visitVarInsn(ALOAD, 0);
+
+            String tempParentProcpath=procPathFunc;
+            String tempChildProcpath=procPathFunc;
+            for(int i=statementCall.ident.getNest()-1;i>=statementCall.ident.getDec().getNest();i--){
+                tempChildProcpath=tempParentProcpath;
+                for (int j=tempChildProcpath.length()-1;j>=0;j--){
+                    if(tempChildProcpath.charAt(j)=='$'){
+                        tempParentProcpath=tempChildProcpath.substring(0,j);
+                        break;
+                    }
+                }
+//                System.out.println("15 child:"+tempChildProcpath);
+//                System.out.println("15 parent:"+tempParentProcpath);
+                methodVisitor.visitFieldInsn(GETFIELD, tempChildProcpath, "this$"+i, "L"+tempParentProcpath+";");
+            }
+
+
+            String currentClassName = fullyQualifiedClassName+statementCall.ident.getDec().getProcpath();
+            String parentClassName = "";
+            for (int i=currentClassName.length()-1;i>=0;i--){
+                if(currentClassName.charAt(i)=='$'){
+                    parentClassName=currentClassName.substring(0,i);
+                    break;
+                }
+            }
+
+            methodVisitor.visitMethodInsn(INVOKESPECIAL, fullyQualifiedClassName+statementCall.ident.getDec().getProcpath(), "<init>", "(L"+parentClassName+";)V", false);
+            methodVisitor.visitMethodInsn(INVOKEVIRTUAL, fullyQualifiedClassName+statementCall.ident.getDec().getProcpath(), "run", "()V", false);
+        }
 
         return null;
     }

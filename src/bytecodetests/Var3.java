@@ -16,7 +16,6 @@ public class Var3 implements Runnable {
             @Override
             public void run() {
                 a = 42;
-                //System.out.println(a);
             }
         }
     }

@@ -64,16 +64,25 @@ public class ScopeVisitor implements ASTVisitor {
     public Object visitProcedure(ProcDec procDec, Object arg) throws PLPException {
         if(PassNumber==0) {
             String name = String.valueOf(procDec.ident.getText());
-
-            procDec.setProcpath(prevpath+"$"+name);
-
-            prevpath = procDec.getProcpath();
             ST.addDec(name, procDec);
          // 5, 6, param 16
             procDec.setNest(ST.currentScope);              //setting nest level
             ST.enterScopeFirst();
+
+
+            procDec.setProcpath(prevpath+"$"+name);
+            prevpath = procDec.getProcpath();
+
             procDec.block.visit(this, arg);
+
             ST.closeScope();
+            for(int i=prevpath.length()-1;i>=0;i--){
+                if(prevpath.charAt(i)=='$'){
+                    prevpath =  prevpath.substring(0,i);
+                    break;
+                }
+            }
+
         }
         else if(PassNumber==1){
             procDec.setNest(ST.currentScope);              //setting nest level
