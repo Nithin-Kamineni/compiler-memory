@@ -94,8 +94,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 
         res.add(new CodeGenUtils.GenClass(fullyQualifiedClassName, classWriter.toByteArray()));
-        Collections.reverse(res);
-//        System.out.println(res.size());
+
+//        Collections.reverse(res);
+        Collections.swap(res, 0, res.size()-1);
+        //        System.out.println(res.size());
         //returning byte class
         return res;
 
@@ -169,8 +171,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             String varName = String.valueOf(varDec.ident.getText());
             String varDescriptor = varDec.getDescriptor();
 
-            FieldVisitor fieldVisitor = classWriter1.visitField(0, varName, varDescriptor, null, null);
-            fieldVisitor.visitEnd();
+            if(varDescriptor!=null){
+                FieldVisitor fieldVisitor = classWriter1.visitField(0, varName, varDescriptor, null, null);
+                fieldVisitor.visitEnd();
+            }
         return null;
     }
 
@@ -522,19 +526,73 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
                     }
                     case NEQ -> {
                         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String","equals","("+"Ljava/lang/Object;"+")"+"Z", false);
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","not","(Z)Z", false);
+                        Label label1start = new Label();
+                        Label label2end = new Label();
+                        mv.visitJumpInsn(IFEQ, label1start);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitJumpInsn(GOTO, label2end);
+                        mv.visitLabel(label1start);
+                        mv.visitInsn(ICONST_1);
+                        mv.visitLabel(label2end);
                     }
                     case LT -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","lt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        Label label1start = new Label();
+                        Label label2end = new Label();
+                        mv.visitInsn(SWAP);
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "startsWith", "(Ljava/lang/String;)Z", false);
+
+                        mv.visitJumpInsn(IFEQ, label1start);
+                        expressionBinary.e0.visit(this, arg);
+                        expressionBinary.e1.visit(this, arg);
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+                        mv.visitJumpInsn(IFNE, label1start);
+                        mv.visitInsn(ICONST_1);
+                        mv.visitJumpInsn(GOTO, label2end);
+                        mv.visitLabel(label1start);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(label2end);
                     }
                     case LE -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","le","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        Label label1start = new Label();
+                        Label label2end = new Label();
+                        mv.visitInsn(SWAP);
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "startsWith", "(Ljava/lang/String;)Z", false);
+                        mv.visitJumpInsn(IFEQ, label1start);
+
+                        mv.visitInsn(ICONST_1);
+                        mv.visitJumpInsn(GOTO, label2end);
+                        mv.visitLabel(label1start);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(label2end);
                     }
                     case GT -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","gt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        Label label1start = new Label();
+                        Label label2end = new Label();
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "endsWith", "(Ljava/lang/String;)Z", false);
+
+                        mv.visitJumpInsn(IFEQ, label1start);
+                        expressionBinary.e0.visit(this, arg);
+                        expressionBinary.e1.visit(this, arg);
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+                        mv.visitJumpInsn(IFNE, label1start);
+                        mv.visitInsn(ICONST_1);
+                        mv.visitJumpInsn(GOTO, label2end);
+                        mv.visitLabel(label1start);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(label2end);
                     }
                     case GE -> {
-                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","ge","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+//                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","ge","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+                        Label label1start = new Label();
+                        Label label2end = new Label();
+                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "endsWith", "(Ljava/lang/String;)Z", false);
+                        mv.visitJumpInsn(IFEQ, label1start);
+
+                        mv.visitInsn(ICONST_1);
+                        mv.visitJumpInsn(GOTO, label2end);
+                        mv.visitLabel(label1start);
+                        mv.visitInsn(ICONST_0);
+                        mv.visitLabel(label2end);
                     }
                     default -> {
                         throw new IllegalStateException("code gen bug in visitExpressionBinary String");

@@ -25,8 +25,11 @@ public abstract class Declaration extends ASTNode {
 		else if(type==Type.NUMBER){
 			return "I";
 		}
-		else{
+		else if(type==Type.STRING){
 			return "Ljava/lang/String;";
+		}
+		else{
+			return null;
 		}
 	}
 
