@@ -293,7 +293,6 @@ public class CodeGenTests7 {
         loadClassesAndRunMain(classes, className);
     }
 
-
     @DisplayName("stringEqOps")
     @Test
     public void stringEqOps(TestInfo testInfo) throws Exception {
@@ -791,7 +790,8 @@ public class CodeGenTests7 {
 									! "IF 2 PASSED!"
 								END;
 							! "IF 1 PASSED!";
-							b:=b+"7"
+							b:=b+"7";
+							!b
 						END
 				END
 				.

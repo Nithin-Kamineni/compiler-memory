@@ -517,6 +517,33 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
             case STRING -> {
                 expressionBinary.e0.visit(this, arg);
                 expressionBinary.e1.visit(this, arg);
+//                switch (op) {
+//                    case PLUS -> {
+//                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String","concat","("+"Ljava/lang/String;"+")"+"Ljava/lang/String;", false);
+//                    }
+//                    case EQ -> {
+//                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String","equals","("+"Ljava/lang/Object;"+")"+"Z", false);
+//                    }
+//                    case NEQ -> {
+//                        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String","equals","("+"Ljava/lang/Object;"+")"+"Z", false);
+//                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","not","(Z)Z", false);
+//                    }
+//                    case LT -> {
+//                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","lt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+//                    }
+//                    case LE -> {
+//                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","le","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+//                    }
+//                    case GT -> {
+//                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","gt","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+//                    }
+//                    case GE -> {
+//                        mv.visitMethodInsn(INVOKESTATIC, "edu/ufl/cise/plpfa22/stringRuntime","ge","("+"Ljava/lang/String;"+"Ljava/lang/String;"+")"+"Z", false);
+//                    }
+//                    default -> {
+//                        throw new IllegalStateException("code gen bug in visitExpressionBinary String");
+//                    }
+//                }
                 switch (op) {
                     case PLUS -> {
                         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String","concat","("+"Ljava/lang/String;"+")"+"Ljava/lang/String;", false);
